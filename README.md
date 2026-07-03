@@ -56,49 +56,57 @@ These instructions will guide you through setting up and using the SmartBill app
 3. **Save & History:** Click **Save to History** to store the invoice in your local browser database. View past documents in the `History` tab.
 4. **Export:** Go to `Preview & Export` to print the A4 document or download it as a Word file.
 5. **Backup:** Regularly use the `Download Backup (.json)` button in the Master Settings to save a physical copy of your database to your hard drive.
-
 ---
 
 ## 📁 File Structure
 
-```text
-SmartBill_India_v1.0/
-│
-├── index.html               # The complete application (HTML/JS/CSS)
-├── README.md                # This documentation file
-└── LICENSE                  # Custom Dual-License file
+    SmartBill_India_v1.0/
+    │
+    ├── index.html               # The complete application (HTML/JS/CSS)
+    ├── README.md                # This documentation file
+    └── LICENSE                  # Custom Dual-License file
 
-🤝 Contributing
+---
+
+## 🤝 Contributing
+
 Contributions are welcome! Please fork the repository and submit pull requests.
 
-Follow coding style and consistency (Vue 3 Composition API structure).
+- Follow coding style and consistency (Vue 3 Composition API structure).
+- Test your changes thoroughly before submission.
+- Include descriptive commit messages.
 
-Test your changes thoroughly before submission.
+---
 
-Include descriptive commit messages.
+## 🎧 Support
 
-🎧 Support
 For issues, commercial licensing, or inquiries, reach out via:
 
-Email: sohilmomin2000@gmail.com
+- **Email:** sohilmomin2000@gmail.com
+- **Creator Profile:** [about.me/drsohil](https://about.me/drsohil)
+- **GitHub Issues:** [github.com/DrSamOnline/SmartBill-India/issues](https://github.com/DrSamOnline)
 
-Creator Profile: about.me/drsohil
+---
 
-GitHub Issues: github.com/DrSamOnline/SmartBill-India/issues
+## ⚖️ License
 
-⚖️ License
-This project is licensed under a Custom Dual License — free for individual/non-commercial use, but requires a paid license for commercial/business use. See the LICENSE file for details.
+This project is licensed under a **Custom Dual License** — free for individual/non-commercial use, but requires a paid license for commercial/business use. See the [LICENSE](LICENSE) file for details.
 
-🙌 Acknowledgments
-Built using Vue.js 3 for reactivity.
+---
 
-Styled entirely with Tailwind CSS.
+## 🙌 Acknowledgments
 
-Icons provided by Font Awesome.
+- Built using **Vue.js 3** for reactivity.
+- Styled entirely with **Tailwind CSS**.
+- Icons provided by **Font Awesome**.
+- Thanks to all contributors and users who provide feedback.
 
-Thanks to all contributors and users who provide feedback.
+---
 
-⚠️ Disclaimer
-Data Storage Warning: This application uses your browser's local storage (IndexedDB). Clearing your browser data, cache, or running strict system cleaners will permanently delete your saved invoices and master settings. Always back up your data frequently using the built-in .json backup tool. Use this software at your own risk.
+## ⚠️ Disclaimer
+
+**Data Storage Warning:** This application uses your browser's local storage (IndexedDB). Clearing your browser data, cache, or running strict system cleaners will permanently delete your saved invoices and master settings. **Always back up your data frequently using the built-in `.json` backup tool.** Use this software at your own risk.
+
+---
 
 Happy Billing! 🚀
