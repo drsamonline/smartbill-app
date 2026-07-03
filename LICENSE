@@ -1,21 +1,24 @@
-MIT License
+SmartBill India Custom Dual License
+Copyright (c) 2026 Sohil Anwarbhai Momin
 
-Copyright (c) 2026 drsamonline
+This software is released under a Dual-License model. By using, copying, or modifying this software, you agree to the terms below.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. INDIVIDUAL AND NON-COMMERCIAL USE (FREE)
+Permission is hereby granted, free of charge, to any individual obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, and modify the Software strictly for personal, hobby, educational, or non-commercial purposes. 
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. COMMERCIAL AND BUSINESS USE (PAID)
+Any use of the Software by a business, corporation, LLC, partnership, or any other commercial entity for internal operations, revenue generation, or client billing requires a commercial license. 
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+To acquire a commercial license, you must contact the copyright holder to negotiate payment and terms. Using this software for commercial purposes without a paid license is strictly prohibited and constitutes copyright infringement.
+
+3. REDISTRIBUTION
+You may share and redistribute the original or modified source code, provided that:
+a) You include this exact license file in all copies.
+b) You do not remove or alter the original copyright notice.
+c) You do not change the terms of this license (you cannot re-license this software under MIT, GPL, etc.).
+
+4. JURISDICTION
+This License shall be governed by and construed in accordance with the laws of India. Any legal action or proceeding arising under this License shall be brought exclusively in the courts located in Vadodara, Gujarat.
+
+5. DISCLAIMER OF WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
