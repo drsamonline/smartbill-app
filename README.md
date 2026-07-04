@@ -49,8 +49,8 @@ These instructions will guide you through setting up and using the SmartBill app
 3. Simply double-click the `index.html` file to open it in your browser.
 
 OR
-See it live in action here -> 
-https://drsamonline.github.io/smartbill-app/
+See it live in action here -> [![Live Demo](https://shields.io)](https://drsamonline.github.io/smartbill-app/)
+
 
 ### 🛠️ Usage
 
