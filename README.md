@@ -46,8 +46,11 @@ These instructions will guide you through setting up and using the SmartBill app
 
 1. Download the ZIP package from the releases or clone this repository.
 2. Extract the files to a folder of your choice.
-3. Simply double-click the `index.html` (or `billing8.html`) file to open it in your browser.
-*(Alternatively, host the file via GitHub Pages to access it from anywhere).*
+3. Simply double-click the `index.html` file to open it in your browser.
+
+OR
+See it live in action here -> 
+https://drsamonline.github.io/smartbill-app/
 
 ### 🛠️ Usage
 
