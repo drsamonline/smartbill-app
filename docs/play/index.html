@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBill India - Pro Billing</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        [v-cloak] { display: none !important; }
+        .a4-page { width: 210mm; min-height: 297mm; background: white; margin: 20px auto; padding: 15mm; box-shadow: 0 0 15px rgba(0,0,0,0.15); position: relative; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .a4-page { box-shadow: none !important; margin: 0 !important; padding: 10mm !important; width: 100% !important; min-height: auto !important; }
+            @page { size: A4; margin: 0; }
+        }
+        .custom-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+<div id="app" v-cloak class="min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-blue-800 text-white p-4 shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <h1 class="text-xl font-bold"><i class="fas fa-file-invoice-dollar mr-2"></i>SmartBill India</h1>
+            <div class="flex gap-2 text-sm">
+                <button @click="currentTab = 'master'" :class="{'bg-blue-600 ring-2 ring-white': currentTab==='master'}" class="px-3 py-2 rounded hover:bg-blue-700 transition">Master & Settings</button>
+                <button @click="currentTab = 'create'" :class="{'bg-blue-600 ring-2 ring-white': currentTab==='create'}" class="px-3 py-2 rounded hover:bg-blue-700 transition">New Invoice</button>
+                <button @click="currentTab = 'history'" :class="{'bg-blue-600 ring-2 ring-white': currentTab==='history'}" class="px-3 py-2 rounded hover:bg-blue-700 transition">History</button>
+                <button @click="currentTab = 'preview'" :class="{'bg-blue-600 ring-2 ring-white': currentTab==='preview'}" class="px-3 py-2 rounded hover:bg-blue-700 transition">Preview & Export</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 max-w-6xl mx-auto w-full">
+
+        <!-- ================= MASTER SETTINGS TAB ================= -->
+        <div v-if="currentTab === 'master'" class="bg-white p-6 rounded-lg shadow space-y-6">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h2 class="text-2xl font-bold text-blue-800">Master Settings</h2>
+                <button @click="saveMasterSettings" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow font-semibold transition">
+                    <i class="fas fa-save mr-2"></i>Save Master Settings
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Company Name</label>
+                    <input v-model="master.companyName" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">GSTIN</label>
+                    <input v-model="master.gstin" class="w-full border p-2 rounded uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-1">Address</label>
+                    <textarea v-model="master.address" rows="2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Company State</label>
+                    <input v-model="master.state" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., Maharashtra">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">State Code</label>
+                    <input v-model="master.stateCode" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., 27">
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold border-b pb-1 mt-6 text-blue-800">Bank Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input v-model="master.bank.accountName" placeholder="Account Name" class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                <input v-model="master.bank.accountNumber" placeholder="Account Number" class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                <input v-model="master.bank.bankName" placeholder="Bank Name" class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                <input v-model="master.bank.branch" placeholder="Branch" class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                <input v-model="master.bank.ifsc" placeholder="IFSC Code" class="border p-2 rounded uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <h3 class="text-lg font-bold border-b pb-1 mt-6 text-blue-800">Uploads</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="border p-3 rounded bg-gray-50 relative">
+                    <label class="block text-sm font-semibold mb-1">Company Logo</label>
+                    <input type="file" accept="image/*" @change="handleImageUpload($event, 'logo')" class="text-sm w-full">
+                    <div v-if="master.logo" class="relative inline-block mt-2">
+                        <img :src="master.logo" class="h-16 border rounded p-1 bg-white">
+                        <button @click="master.logo = ''" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="border p-3 rounded bg-gray-50 relative">
+                    <label class="block text-sm font-semibold mb-1">Authorized Signature</label>
+                    <input type="file" accept="image/*" @change="handleImageUpload($event, 'signature')" class="text-sm w-full">
+                    <div v-if="master.signature" class="relative inline-block mt-2">
+                        <img :src="master.signature" class="h-16 border rounded p-1 bg-white">
+                        <button @click="master.signature = ''" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="border p-3 rounded bg-gray-50 relative">
+                    <label class="block text-sm font-semibold mb-1">Payment QR Code</label>
+                    <input type="file" accept="image/*" @change="handleImageUpload($event, 'qr')" class="text-sm w-full">
+                    <div v-if="master.qr" class="relative inline-block mt-2">
+                        <img :src="master.qr" class="h-24 border rounded p-1 bg-white mx-auto">
+                        <button @click="master.qr = ''" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold border-b pb-1 mt-6 text-blue-800 flex justify-between items-center">
+                <span>Products / Services Master</span>
+                <button @click="addMasterItem" class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                    <i class="fas fa-plus mr-1"></i>Add Item
+                </button>
+            </h3>
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="border p-2 text-left">Item Name</th>
+                            <th class="border p-2 w-24">HSN/SAC</th>
+                            <th class="border p-2 w-20">Unit</th>
+                            <th class="border p-2 w-24">Rate (₹)</th>
+                            <th class="border p-2 w-20">Tax %</th>
+                            <th class="border p-2 w-16"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(mi, idx) in master.itemsList" :key="mi.id">
+                            <td class="border p-1"><input v-model="mi.name" class="w-full p-1 border-b focus:outline-none focus:border-blue-500" placeholder="Item Name"></td>
+                            <td class="border p-1"><input v-model="mi.hsn" class="w-full p-1 text-center border-b focus:outline-none"></td>
+                            <td class="border p-1"><input v-model="mi.unit" class="w-full p-1 text-center border-b focus:outline-none"></td>
+                            <td class="border p-1"><input type="number" step="0.01" v-model.number="mi.rate" class="w-full p-1 text-right border-b focus:outline-none"></td>
+                            <td class="border p-1"><input type="number" step="0.01" v-model.number="mi.tax" class="w-full p-1 text-right border-b focus:outline-none"></td>
+                            <td class="border p-1 text-center">
+                                <button @click="removeMasterItem(idx)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr v-if="master.itemsList.length === 0">
+                            <td colspan="6" class="border p-4 text-center text-gray-500">No items added yet. Click "Add Item" above.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6">
+                <label class="block text-sm font-semibold mb-1">Default Terms & Conditions</label>
+                <textarea v-model="master.terms" rows="3" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mt-6">
+                <h3 class="text-lg font-bold text-blue-800 mb-2"><i class="fas fa-shield-alt mr-2"></i>Data Backup & Restore</h3>
+                <p class="text-sm text-gray-700 mb-4">Downloads a single file containing ALL settings, master items, and saved invoices. Use "Restore" on any device to recover data.</p>
+                <div class="flex flex-wrap gap-4">
+                    <button @click="backupData" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow font-semibold transition">
+                        <i class="fas fa-download mr-2"></i>Download Backup (.json)
+                    </button>
+                    <label class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer shadow font-semibold transition">
+                        <i class="fas fa-upload mr-2"></i>Restore from Backup
+                        <input type="file" accept=".json" @change="restoreData" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CREATE INVOICE TAB ================= -->
+        <div v-if="currentTab === 'create'" class="bg-white p-6 rounded-lg shadow space-y-6">
+            <h2 class="text-2xl font-bold border-b pb-2 text-blue-800">Create Invoice / Quotation</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Type</label>
+                    <select v-model="invoice.type" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option>Tax Invoice</option>
+                        <option>Quotation</option>
+                        <option>Proforma Invoice</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Invoice No.</label>
+                    <input v-model="invoice.number" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Date</label>
+                    <input type="date" v-model="invoice.date" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Due Date</label>
+                    <input type="date" v-model="invoice.dueDate" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded border border-blue-100">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Bill To (Name)</label>
+                    <input v-model="invoice.customerName" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Customer GSTIN</label>
+                    <input v-model="invoice.customerGstin" class="w-full border p-2 rounded uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-1">Customer Address</label>
+                    <textarea v-model="invoice.customerAddress" rows="2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Place of Supply</label>
+                    <input v-model="invoice.placeOfSupply" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., Maharashtra">
+                </div>
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center space-x-2 cursor-pointer select-none">
+                        <input type="checkbox" v-model="invoice.reverseCharge" class="w-5 h-5 text-blue-600 rounded">
+                        <span class="font-semibold text-gray-700">Reverse Charge Applicable</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-gray-200 text-gray-700">
+                        <tr>
+                            <th class="border p-2 w-12">Sr</th>
+                            <th class="border p-2 w-1/4">Description</th>
+                            <th class="border p-2 w-24">HSN/SAC</th>
+                            <th class="border p-2 w-16">Qty</th>
+                            <th class="border p-2 w-16">Unit</th>
+                            <th class="border p-2 w-24">Rate (₹)</th>
+                            <th class="border p-2 w-20">Disc %</th>
+                            <th class="border p-2 w-20">Tax %</th>
+                            <th class="border p-2 w-28">Amount (₹)</th>
+                            <th class="border p-2 w-24 no-print">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(item, index) in invoice.items" :key="item.id">
+                            <!-- Main Item Row -->
+                            <tr class="hover:bg-gray-50 border-t-2 border-gray-300 bg-white" style="page-break-inside: avoid;">
+                                <td class="border p-1 text-center font-bold">{{ index + 1 }}</td>
+                                <td class="border p-1">
+                                    <input v-model="item.description" list="master-items-list" @change="autoFillItem(item)" class="w-full font-semibold border-b focus:outline-none focus:border-blue-500 p-1" placeholder="Main Item Name...">
+                                    <datalist id="master-items-list">
+                                        <option v-for="mi in master.itemsList" :value="mi.name" :key="mi.id"></option>
+                                    </datalist>
+                                </td>
+                                <td class="border p-1"><input v-model="item.hsn" class="w-full text-center border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" v-model.number="item.qty" class="w-full text-center border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input v-model="item.unit" class="w-full text-center border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.rate" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.disc" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.tax" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1 text-right font-bold bg-gray-50">₹{{ getRowTotal(item).toFixed(2) }}</td>
+                                <td class="border p-1 text-center no-print space-x-1">
+                                    <button @click="addSubItem(index)" class="text-blue-600 hover:text-blue-800 text-xs font-semibold" title="Add Sub-item"><i class="fas fa-plus-circle mr-1"></i>Sub</button>
+                                    <button @click="removeItem(index)" class="text-red-500 hover:text-red-700 text-xs" title="Remove Main Item"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Sub Item Rows (Strict Grid Alignment, No Financial Impact) -->
+                            <tr v-for="(sub, subIndex) in item.subItems" :key="sub.id" class="bg-gray-50" style="page-break-inside: avoid;">
+                                <td class="border p-1 text-center text-gray-600 text-xs">{{ index + 1 }}.{{ subIndex + 1 }}</td>
+                                <td class="border p-1">
+                                    <div class="flex items-center">
+                                        <span class="text-gray-400 mr-2 w-4 flex-shrink-0">↳</span>
+                                        <input v-model="sub.description" list="master-items-list" @change="autoFillItem(sub)" class="flex-grow text-sm border-b focus:outline-none focus:border-blue-500 p-1 bg-transparent font-medium text-gray-700" placeholder="Sub-item description...">
+                                    </div>
+                                </td>
+                                <td class="border p-1"><input v-model="sub.hsn" class="w-full text-center text-sm border-b focus:outline-none p-1 bg-transparent"></td>
+                                <td class="border p-1"><input type="number" v-model.number="sub.qty" class="w-full text-center text-sm border-b focus:outline-none p-1 bg-transparent"></td>
+                                <td class="border p-1 text-center text-gray-400 text-sm">-</td>
+                                <td class="border p-1"><input type="number" step="0.01" v-model.number="sub.rate" class="w-full text-right text-sm border-b focus:outline-none p-1 bg-transparent"></td>
+                                <td class="border p-1 text-center text-gray-400 text-sm">-</td>
+                                <td class="border p-1 text-center text-gray-400 text-sm">-</td>
+                                <td class="border p-1 text-right font-semibold text-gray-400 text-sm">-</td>
+                                <td class="border p-1 text-center no-print">
+                                    <button @click="removeSubItem(index, subIndex)" class="text-red-500 hover:text-red-700 text-xs" title="Remove Sub-item"><i class="fas fa-times-circle"></i></button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <button @click="addItem" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-700 no-print transition shadow">
+                    <i class="fas fa-plus mr-1"></i> Add Main Item
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Notes / General Info</label>
+                    <textarea v-model="invoice.notes" rows="3" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Thank you for your business..."></textarea>
+                </div>
+                <div class="bg-gray-50 p-4 rounded border space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-600">Subtotal (Taxable):</span> <span>₹{{ totalTaxable.toFixed(2) }}</span></div>
+                    <div class="flex justify-between text-red-600" v-if="totalDiscount > 0"><span>Total Discount:</span> <span>- ₹{{ totalDiscount.toFixed(2) }}</span></div>
+                    
+                    <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
+                    <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+
+                    <div class="flex justify-between text-xl font-bold border-t-2 border-gray-800 pt-2 mt-2">
+                        <span>Grand Total:</span> <span>₹{{ grandTotal.toFixed(2) }}</span>
+                    </div>
+                    <div class="text-sm italic text-gray-800 mt-2 bg-blue-50 p-2 rounded border border-blue-100">
+                        <strong>In Words:</strong> {{ totalInWords }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 no-print">
+                <button @click="saveInvoice" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700 shadow transition">
+                    <i class="fas fa-save mr-2"></i> Save to History
+                </button>
+                <button @click="currentTab = 'preview'" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 shadow transition">
+                    <i class="fas fa-eye mr-2"></i> Preview & Export
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= HISTORY TAB ================= -->
+        <div v-if="currentTab === 'history'" class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-bold border-b pb-2 mb-4 text-blue-800">Saved Invoices</h2>
+            <div v-if="savedInvoices.length === 0" class="text-center text-gray-500 py-8">No saved invoices yet.</div>
+            <div class="overflow-x-auto custom-scroll" v-else>
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="border p-2 text-left">No.</th>
+                            <th class="border p-2 text-left">Date</th>
+                            <th class="border p-2 text-left">Customer</th>
+                            <th class="border p-2 text-right">Total</th>
+                            <th class="border p-2 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(inv, idx) in savedInvoices" :key="idx" class="hover:bg-gray-50">
+                            <td class="border p-2 font-semibold">{{ inv.number }}</td>
+                            <td class="border p-2">{{ formatDate(inv.date) }}</td>
+                            <td class="border p-2">{{ inv.customerName || 'N/A' }}</td>
+                            <td class="border p-2 text-right font-bold">₹{{ calculateInvoiceTotal(inv).toFixed(2) }}</td>
+                            <td class="border p-2 text-center space-x-2">
+                                <button @click="loadInvoice(idx)" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button @click="deleteInvoice(idx)" class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= PREVIEW & EXPORT TAB ================= -->
+        <div v-if="currentTab === 'preview'" class="space-y-4">
+            <div class="flex flex-wrap justify-between items-center no-print bg-white p-4 rounded shadow sticky top-20 z-40">
+                <h2 class="text-xl font-bold text-blue-800">Document Preview</h2>
+                <div class="flex gap-2 mt-2 sm:mt-0">
+                    <button @click="printDoc" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition"><i class="fas fa-print mr-2"></i>Print</button>
+                    <button @click="exportWord" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"><i class="fas fa-file-word mr-2"></i>Word</button>
+                    <button @click="currentTab = 'create'" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"><i class="fas fa-arrow-left mr-2"></i>Edit</button>
+                </div>
+            </div>
+
+            <!-- A4 Print Area -->
+            <div id="print-area" class="a4-page text-sm relative">
+                <!-- Header -->
+                <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-4">
+                    <div class="flex items-center gap-4">
+                        <img v-if="master.logo" :src="master.logo" class="h-16 w-auto object-contain">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">{{ master.companyName || 'Your Company Name' }}</h1>
+                            <p class="text-gray-600 whitespace-pre-line text-xs mt-1">{{ master.address }}</p>
+                            <p class="text-gray-600 text-xs mt-1" v-if="master.gstin">GSTIN: <span class="font-semibold">{{ master.gstin }}</span></p>
+                            <p class="text-gray-600 text-xs" v-if="master.state">State: {{ master.state }} (Code: {{ master.stateCode }})</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-3xl font-bold text-blue-800 uppercase">{{ invoice.type }}</h2>
+                        <p class="font-semibold mt-2 text-sm">No: <span class="text-gray-700">{{ invoice.number }}</span></p>
+                        <p class="text-gray-600 text-xs">Date: {{ formatDate(invoice.date) }}</p>
+                        <p class="text-gray-600 text-xs">Due: {{ formatDate(invoice.dueDate) }}</p>
+                    </div>
+                </div>
+
+                <!-- Customer Details (Inline Format) -->
+                <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+                    <div class="mb-1">
+                        <span class="font-bold text-gray-700 text-xs uppercase">Bill To:</span>
+                        <span class="font-semibold text-base ml-2">{{ invoice.customerName || 'Customer Name' }}</span>
+                        <span class="text-gray-600 text-sm ml-2">| {{ invoice.customerAddress }}</span>
+                    </div>
+                    <div class="text-xs text-gray-600" v-if="invoice.customerGstin">GSTIN: {{ invoice.customerGstin }}</div>
+                    <div class="text-right text-xs mt-2 space-y-1">
+                        <p><span class="font-semibold text-gray-700">Place of Supply:</span> {{ invoice.placeOfSupply || 'Not Specified' }}</p>
+                        <p><span class="font-semibold text-gray-700">Reverse Charge:</span> {{ invoice.reverseCharge ? 'Yes' : 'No' }}</p>
+                    </div>
+                </div>
+
+                <!-- Items Table (Strict 9-Column Grid) -->
+                <table class="w-full border-collapse border border-gray-400 mb-6">
+                    <thead class="bg-gray-200 text-gray-800 text-xs uppercase">
+                        <tr>
+                            <th class="border border-gray-400 p-2 w-12">Sr</th>
+                            <th class="border border-gray-400 p-2 text-left">Description</th>
+                            <th class="border border-gray-400 p-2 w-24">HSN/SAC</th>
+                            <th class="border border-gray-400 p-2 w-16">Qty</th>
+                            <th class="border border-gray-400 p-2 w-16">Unit</th>
+                            <th class="border border-gray-400 p-2 w-24 text-right">Rate</th>
+                            <th class="border border-gray-400 p-2 w-20 text-right">Disc</th>
+                            <th class="border border-gray-400 p-2 w-20 text-right">Tax</th>
+                            <th class="border border-gray-400 p-2 w-28 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(item, index) in invoice.items" :key="item.id">
+                            <!-- Main Item Print Row -->
+                            <tr class="border-t-2 border-gray-300" style="page-break-inside: avoid;">
+                                <td class="border border-gray-400 p-2 text-center font-bold">{{ index + 1 }}</td>
+                                <td class="border border-gray-400 p-2">
+                                    <div class="font-bold text-gray-900">{{ item.description || 'Item' }}</div>
+                                </td>
+                                <td class="border border-gray-400 p-2 text-center">{{ item.hsn }}</td>
+                                <td class="border border-gray-400 p-2 text-center">{{ item.qty }}</td>
+                                <td class="border border-gray-400 p-2 text-center">{{ item.unit }}</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ item.rate.toFixed(2) }}</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ item.disc }}%</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ item.tax }}%</td>
+                                <td class="border border-gray-400 p-2 text-right font-bold">₹{{ getRowTotal(item).toFixed(2) }}</td>
+                            </tr>
+                            <!-- Sub Items Print Rows -->
+                            <tr v-for="(sub, subIndex) in item.subItems" :key="sub.id" class="bg-gray-50" style="page-break-inside: avoid;">
+                                <td class="border border-gray-400 p-2 text-center text-gray-600 text-xs">{{ index + 1 }}.{{ subIndex + 1 }}</td>
+                                <td class="border border-gray-400 p-2">
+                                    <div class="text-gray-700 pl-4 text-sm font-medium">↳ {{ sub.description || 'Sub-item' }}</div>
+                                </td>
+                                <td class="border border-gray-400 p-2 text-center text-xs">{{ sub.hsn }}</td>
+                                <td class="border border-gray-400 p-2 text-center text-xs">{{ sub.qty || 0 }}</td>
+                                <td class="border border-gray-400 p-2 text-center text-gray-400 text-xs">-</td>
+                                <td class="border border-gray-400 p-2 text-right text-xs">{{ sub.rate ? sub.rate.toFixed(2) : '0.00' }}</td>
+                                <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
+                                <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
+                                <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+                <!-- Financials & Signature Block (Page 1 Bottom) -->
+                <div class="flex justify-between items-start mb-4" style="page-break-inside: avoid;">
+                    <!-- Left: Bank Details & QR -->
+                    <div class="w-1/2 pr-6">
+                        <h4 class="font-bold text-xs mb-2 text-gray-700 uppercase">Bank Details:</h4>
+                        <div class="flex items-start gap-4">
+                            <div class="flex-1 text-xs space-y-1">
+                                <p><strong>Account Name:</strong> {{ master.bank.accountName }}</p>
+                                <p><strong>Account No:</strong> {{ master.bank.accountNumber }}</p>
+                                <p><strong>Bank & Branch:</strong> {{ master.bank.bankName }}, {{ master.bank.branch }}</p>
+                                <p><strong>IFSC:</strong> {{ master.bank.ifsc }}</p>
+                            </div>
+                            <div class="w-24 text-center flex-shrink-0">
+                                <img v-if="master.qr" :src="master.qr" class="h-20 w-20 object-contain border rounded bg-white p-1">
+                                <p class="text-xs font-semibold text-gray-700 mt-1">Scan to Pay</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Totals -->
+                    <div class="w-1/2 space-y-2 text-right text-sm">
+                        <div class="flex justify-between"><span class="text-gray-600">Subtotal (Taxable):</span> <span>₹{{ totalTaxable.toFixed(2) }}</span></div>
+                        <div class="flex justify-between text-red-600" v-if="totalDiscount > 0"><span>Total Discount:</span> <span>- ₹{{ totalDiscount.toFixed(2) }}</span></div>
+                        <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
+                        <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+                        <div class="flex justify-between text-xl font-bold border-t-2 border-black pt-2 mt-2">
+                            <span>Grand Total:</span> <span>₹{{ grandTotal.toFixed(2) }}</span>
+                        </div>
+                        <div class="text-sm italic text-gray-800 bg-gray-100 p-2 rounded mt-2 text-left border border-gray-300">
+                            <strong>Amount in Words:</strong> {{ totalInWords }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signature (Below Financials) -->
+                <div class="flex justify-end mb-8" style="page-break-inside: avoid;">
+                    <div class="text-center w-48">
+                        <div class="h-16 flex items-end justify-center mb-1">
+                            <img v-if="master.signature" :src="master.signature" class="h-12 object-contain">
+                            <div v-else class="border-b border-black w-32"></div>
+                        </div>
+                        <p class="text-xs font-bold text-gray-800">Authorized Signatory</p>
+                        <p class="text-xs text-gray-600">{{ master.companyName }}</p>
+                    </div>
+                </div>
+
+                <!-- Page 2: Notes & Terms (Forced Page Break) -->
+                <div class="mt-8" style="page-break-before: always;">
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm mb-2 text-gray-700 uppercase">Notes:</h4>
+                        <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ invoice.notes }}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-sm mb-2 text-gray-700 uppercase">Terms & Conditions:</h4>
+                        <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ master.terms }}</p>
+                        <p class="text-xs text-gray-400 mt-4 italic">This is a computer-generated document.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+
+    // --- NATIVE INDEXEDDB WRAPPER (Zero Dependencies) ---
+    const DB_NAME = 'SmartBillDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'appData';
+
+    const initDB = () => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            request.onsuccess = (event) => resolve(event.target.result);
+            request.onerror = (event) => reject(event.target.error);
+        });
+    };
+
+    const saveToDB = async (key, data) => {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            // CRITICAL: Deep clone to strip Vue 3 Proxies and prevent DataCloneError
+            const cleanData = JSON.parse(JSON.stringify(data));
+            const request = store.put(cleanData, key);
+            request.onsuccess = () => resolve();
+            request.onerror = (event) => reject(event.target.error);
+        });
+    };
+
+    const loadFromDB = async (key, fallback) => {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(key);
+            request.onsuccess = (event) => {
+                resolve(event.target.result !== undefined ? event.target.result : fallback);
+            };
+            request.onerror = (event) => reject(event.target.error);
+        });
+    };
+
+    createApp({
+        setup() {
+            const currentTab = ref('create');
+            const isLoaded = ref(false); // Race condition prevention
+            const quotaAlertShown = ref(false); // Micro-optimization: prevent alert spam
+            
+            const defaultMaster = {
+                companyName: 'My Company Pvt Ltd',
+                gstin: '27AABCU9603R1ZX',
+                address: '123, Business Park, Mumbai, Maharashtra - 400001',
+                state: 'Maharashtra',
+                stateCode: '27',
+                bank: { accountName: 'My Company Pvt Ltd', accountNumber: '123456789012', bankName: 'State Bank of India', branch: 'Andheri West', ifsc: 'SBIN0001234' },
+                terms: '1. Payment due within 15 days.\n2. Interest @18% p.a. on delayed payments.\n3. Subject to local jurisdiction.',
+                logo: '', signature: '', qr: '',
+                itemsList: [
+                    { id: '1', name: 'Consultation Fee', hsn: '999311', unit: 'Nos', rate: 1000, tax: 18 },
+                    { id: '2', name: 'Basic Service', hsn: '998714', unit: 'Hrs', rate: 500, tax: 18 }
+                ]
+            };
+
+            // Initialize with defaults
+            const master = reactive(JSON.parse(JSON.stringify(defaultMaster)));
+            const savedInvoices = ref([]);
+
+            const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+            const getNewInvoiceNumber = () => `INV-${new Date().getFullYear()}-${String(savedInvoices.value.length + 1).padStart(3, '0')}`;
+
+            const invoice = reactive({
+                type: 'Tax Invoice',
+                number: getNewInvoiceNumber(),
+                date: new Date().toISOString().split('T')[0],
+                dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                customerName: '',
+                customerAddress: '',
+                customerGstin: '',
+                placeOfSupply: '',
+                reverseCharge: false,
+                notes: 'Thank you for your business!',
+                items: [{ id: generateId(), description: '', hsn: '', qty: 1, unit: 'Nos', rate: 0, disc: 0, tax: 18, subItems: [] }]
+            });
+
+            // Schema normalization for backward compatibility
+            const normalizeInvoice = (inv) => {
+                inv.items.forEach(item => {
+                    if (!item.subItems) item.subItems = [];
+                    item.subItems.forEach(sub => {
+                        if (typeof sub.qty === 'undefined') sub.qty = 1;
+                        if (typeof sub.rate === 'undefined') sub.rate = 0;
+                    });
+                });
+                return inv;
+            };
+
+            // --- ASYNC STATE INITIALIZATION ---
+            onMounted(async () => {
+                try {
+                    const loadedMaster = await loadFromDB('master', defaultMaster);
+                    Object.assign(master, loadedMaster);
+
+                    const loadedInvoices = await loadFromDB('invoices', []);
+                    savedInvoices.value = loadedInvoices.map(normalizeInvoice);
+
+                    isLoaded.value = true; // Unlock watchers only AFTER data is loaded
+                } catch (err) {
+                    console.error("DB Load Error:", err);
+                    isLoaded.value = true; // Fallback to defaults to prevent app lockup
+                }
+            });
+
+            // --- GATED WATCHERS (Prevents overwriting DB with defaults on load) ---
+            watch(master, async (newVal) => {
+                if (!isLoaded.value) return;
+                try { await saveToDB('master', newVal); } 
+                catch (e) { 
+                    console.error("Save master failed", e); 
+                    if (e.name === 'QuotaExceededError' && !quotaAlertShown.value) {
+                        quotaAlertShown.value = true;
+                        alert('Storage full! Please use the JSON Backup feature to save your data.');
+                    }
+                }
+            }, { deep: true });
+
+            watch(savedInvoices, async (newVal) => {
+                if (!isLoaded.value) return;
+                try { await saveToDB('invoices', newVal); } 
+                catch (e) { 
+                    console.error("Save invoices failed", e);
+                    if (e.name === 'QuotaExceededError' && !quotaAlertShown.value) {
+                        quotaAlertShown.value = true;
+                        alert('Storage full! Please use the JSON Backup feature to save your data.');
+                    }
+                }
+            }, { deep: true });
+
+            // --- STRICTLY MAIN ITEM CALCULATIONS (No IGST, Permanent 50/50 Split) ---
+            const getRowTaxable = (row) => (row.rate * row.qty) - ((row.rate * row.qty * row.disc) / 100);
+            const getRowTax = (row) => (getRowTaxable(row) * row.tax) / 100;
+            const getRowTotal = (row) => getRowTaxable(row) + getRowTax(row);
+
+            const totalTaxable = computed(() => invoice.items.reduce((sum, item) => sum + getRowTaxable(item), 0));
+            const totalDiscount = computed(() => invoice.items.reduce((sum, item) => sum + ((item.rate * item.qty * item.disc) / 100), 0));
+            
+            // Total tax from main items only
+            const totalTax = computed(() => invoice.items.reduce((sum, item) => sum + getRowTax(item), 0));
+            
+            // Permanent 50/50 split
+            const totalCGST = computed(() => totalTax.value / 2);
+            const totalSGST = computed(() => totalTax.value / 2);
+            
+            const grandTotal = computed(() => totalTaxable.value + totalCGST.value + totalSGST.value);
+
+            const totalInWords = computed(() => {
+                const num = Number(grandTotal.value);
+                if (isNaN(num)) return 'Zero Rupees Only';
+                if (num === 0) return 'Zero Rupees Only';
+                const [rupees, paise] = num.toFixed(2).split('.');
+                let result = '';
+                const a = ['','One ','Two ','Three ','Four ','Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+                const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+                const convert = (n) => n > 19 ? b[Math.floor(n / 10)] + ' ' + a[n % 10] : a[n];
+
+                let numInt = parseInt(rupees);
+                if (numInt > 0) {
+                    if (numInt >= 10000000) { result += convert(Math.floor(numInt / 10000000)) + 'Crore '; numInt %= 10000000; }
+                    if (numInt >= 100000) { result += convert(Math.floor(numInt / 100000)) + 'Lakh '; numInt %= 100000; }
+                    if (numInt >= 1000) { result += convert(Math.floor(numInt / 1000)) + 'Thousand '; numInt %= 1000; }
+                    if (numInt >= 100) { result += convert(Math.floor(numInt / 100)) + 'Hundred '; numInt %= 100; }
+                    if (numInt > 0) result += (result ? 'and ' : '') + convert(numInt);
+                    result += 'Rupees ';
+                }
+                if (parseInt(paise) > 0) result += (result ? 'and ' : '') + convert(parseInt(paise)) + 'Paise ';
+                return (result || 'Zero') + 'Only';
+            });
+
+            // --- ACTIONS ---
+            const addItem = () => invoice.items.push({ id: generateId(), description: '', hsn: '', qty: 1, unit: 'Nos', rate: 0, disc: 0, tax: 18, subItems: [] });
+            const removeItem = (index) => { if (invoice.items.length > 1) invoice.items.splice(index, 1); };
+            
+            const addSubItem = (parentIndex) => {
+                invoice.items[parentIndex].subItems.push({ id: generateId(), description: '', hsn: '', qty: 1, rate: 0 });
+            };
+            const removeSubItem = (parentIndex, subIndex) => invoice.items[parentIndex].subItems.splice(subIndex, 1);
+
+            const autoFillItem = (row) => {
+                const found = master.itemsList.find(mi => mi.name.toLowerCase() === row.description.toLowerCase());
+                if (found) {
+                    row.hsn = found.hsn;
+                    // Only apply unit/tax to main items to prevent data model pollution
+                    if (!Array.isArray(row.subItems)) {
+                        row.unit = found.unit;
+                        row.tax = found.tax;
+                    }
+                    row.rate = found.rate; // Applied to both for display convenience
+                }
+            };
+
+            const addMasterItem = () => master.itemsList.push({ id: generateId(), name: '', hsn: '', unit: 'Nos', rate: 0, tax: 18 });
+            const removeMasterItem = (idx) => master.itemsList.splice(idx, 1);
+            
+            const saveMasterSettings = async () => { 
+                await saveToDB('master', master); 
+                alert("Master settings saved successfully!"); 
+            };
+
+            const handleImageUpload = (event, field) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 400;
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        master[field] = canvas.toDataURL('image/jpeg', 0.7);
+                    };
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+
+            const saveInvoice = async () => {
+                savedInvoices.value.push(JSON.parse(JSON.stringify(invoice)));
+                await saveToDB('invoices', savedInvoices.value);
+                alert('Invoice saved to history!');
+                Object.assign(invoice, {
+                    number: getNewInvoiceNumber(), customerName: '', customerAddress: '', customerGstin: '', placeOfSupply: '',
+                    items: [{ id: generateId(), description: '', hsn: '', qty: 1, unit: 'Nos', rate: 0, disc: 0, tax: 18, subItems: [] }]
+                });
+            };
+
+            const loadInvoice = (idx) => {
+                Object.assign(invoice, normalizeInvoice(JSON.parse(JSON.stringify(savedInvoices.value[idx]))));
+                currentTab.value = 'create';
+            };
+
+            const deleteInvoice = async (idx) => { 
+                if(confirm('Delete this invoice?')) {
+                    savedInvoices.value.splice(idx, 1);
+                    await saveToDB('invoices', savedInvoices.value);
+                }
+            };
+            
+            const calculateInvoiceTotal = (inv) => inv.items.reduce((sum, item) => sum + getRowTotal(item), 0);
+
+            // --- EXPORTS ---
+            const printDoc = () => window.print();
+            
+            const exportWord = () => {
+                const content = document.getElementById('print-area').innerHTML;
+                const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>Invoice</title>
+                <style>body{font-family: Arial, sans-serif; font-size: 11pt;} table{width:100%; border-collapse: collapse;} td, th{border: 1px solid #000; padding: 5px;} .page-break { page-break-before: always; }</style>
+                </head><body>${content}</body></html>`;
+                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${invoice.number}.doc`;
+                link.click();
+            };
+
+            // --- BACKUP & RESTORE ---
+            const backupData = () => {
+                try {
+                    const data = { 
+                        version: "8.0", 
+                        master: JSON.parse(JSON.stringify(master)), 
+                        savedInvoices: JSON.parse(JSON.stringify(savedInvoices.value)), 
+                        exportDate: new Date().toISOString() 
+                    };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = `SmartBill_Backup_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                    alert("Backup downloaded successfully!");
+                } catch (e) { alert("Backup failed. Check console."); }
+            };
+
+            const restoreData = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.master || !data.savedInvoices) throw new Error("Invalid format");
+                        
+                        Object.assign(master, data.master);
+                        savedInvoices.value = data.savedInvoices.map(normalizeInvoice);
+                        
+                        // CRITICAL: Explicitly save to DB immediately after restore
+                        await saveToDB('master', master);
+                        await saveToDB('invoices', savedInvoices.value);
+                        
+                        alert('Data restored successfully!');
+                        currentTab.value = 'master';
+                    } catch (err) { alert('Invalid backup file.'); }
+                };
+                reader.readAsText(file);
+            };
+
+            return {
+                currentTab, master, invoice, savedInvoices,
+                getRowTotal, totalTaxable, totalDiscount, totalCGST, totalSGST, grandTotal, totalInWords,
+                addItem, removeItem, addSubItem, removeSubItem, autoFillItem, 
+                addMasterItem, removeMasterItem, saveMasterSettings, handleImageUpload, formatDate,
+                saveInvoice, loadInvoice, deleteInvoice, calculateInvoiceTotal,
+                printDoc, exportWord, backupData, restoreData
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>

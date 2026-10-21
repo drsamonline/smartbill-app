@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBill India — Serverless GST Invoicing for Indian Businesses</title>
+<meta name="description" content="SmartBill India is a fast, serverless, offline-first single-page billing and invoicing app for Indian businesses. GST-ready tax invoices, quotations and proformas — no signup, and your data stays on your device.">
+<meta name="keywords" content="GST invoicing, India billing software, serverless invoice app, offline invoicing, IndexedDB, tax invoice, HSN SAC, CGST SGST, quotation, proforma invoice, Vue.js billing, free invoice generator India">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#059669">
+<link rel="canonical" href="https://drsamonline.github.io/smartbill-app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SmartBill India">
+<meta property="og:title" content="SmartBill India — Serverless GST Invoicing for Indian Businesses">
+<meta property="og:description" content="A fast, serverless, single-page billing and invoicing app for Indian businesses. GST-ready, works offline, no signup — your data stays on your device.">
+<meta property="og:url" content="https://drsamonline.github.io/smartbill-app/">
+<meta property="og:image" content="https://socialify.git.ci/drsamonline/smartbill-app/image?name=1&amp;owner=1&amp;description=1&amp;language=1&amp;theme=Light&amp;font=Inter">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="SmartBill India — serverless GST invoicing app">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SmartBill India — Serverless GST Invoicing for Indian Businesses">
+<meta name="twitter:description" content="GST-ready invoicing that runs entirely in your browser. Works offline, no signup, data stays on your device.">
+<meta name="twitter:image" content="https://socialify.git.ci/drsamonline/smartbill-app/image?name=1&amp;owner=1&amp;description=1&amp;language=1&amp;theme=Light&amp;font=Inter">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23059669'/%3E%3Cpath d='M11 8h7l4 4v12H11z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M14 15h5M14 19h5' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="assets/logo.svg">
+<link rel="mask-icon" href="assets/logo.svg" color="#059669">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SmartBill India",
+  "alternateName": "SmartBill - Pro Billing",
+  "url": "https://drsamonline.github.io/smartbill-app/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any modern web browser",
+  "browserRequirements": "Requires JavaScript and IndexedDB",
+  "description": "A fast, serverless, single-page billing and invoicing application built with Vue.js, tailored for Indian businesses. GST-ready tax invoices, quotations and proformas with local IndexedDB storage and complete export capabilities.",
+  "inLanguage": "en-IN",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "featureList": [
+    "100% serverless — no backend or database",
+    "Works offline with local IndexedDB storage",
+    "GST & tax ready — HSN/SAC, CGST, SGST, state codes, reverse charge",
+    "Tax invoices, quotations and proforma invoices",
+    "No signup and no account required",
+    "Your data stays on your device",
+    "A4 print layouts and Word (.doc) export",
+    "JSON backup and restore"
+  ],
+  "author": { "@type": "Person", "name": "Dr. Sohil Momin", "url": "https://about.me/drsohil" },
+  "codeRepository": "https://github.com/drsamonline/smartbill-app",
+  "license": "https://github.com/drsamonline/smartbill-app/blob/main/LICENSE"
+}
+</script>
+
+<style>
+:root{
+  --emerald:#059669;
+  --emerald-d:#047857;
+  --emerald-l:#10b981;
+  --indigo:#4f46e5;
+  --indigo-d:#4338ca;
+  --ink:#0f172a;
+  --ink-2:#334155;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --line-2:#eef2f7;
+  --surface:#ffffff;
+  --canvas:#f7fafc;
+  --emerald-tint:#ecfdf5;
+  --indigo-tint:#eef2ff;
+  --radius:16px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04);
+  --shadow:0 10px 30px -12px rgba(15,23,42,.18),0 2px 6px rgba(15,23,42,.05);
+  --shadow-lg:0 24px 60px -24px rgba(15,23,42,.28);
+  --maxw:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--canvas);color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;font-feature-settings:'tnum' 1;
+}
+h1,h2,h3,h4{line-height:1.18;margin:0;letter-spacing:-.02em;font-weight:750}
+p{margin:0}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ---------- Nav ---------- */
+.nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.02rem;text-decoration:none;letter-spacing:-.02em}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--emerald),var(--emerald-l));display:grid;place-items:center;box-shadow:0 6px 14px -6px rgba(5,150,105,.7)}
+.brand .mark svg{width:19px;height:19px}
+.brand small{display:block;font-size:.66rem;font-weight:600;color:var(--emerald);letter-spacing:.08em;text-transform:uppercase}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center}
+.nav-links a{text-decoration:none;font-size:.9rem;font-weight:600;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:background .18s,color .18s}
+.nav-links a:hover{background:var(--emerald-tint);color:var(--emerald-d)}
+.nav-cta{background:var(--emerald)!important;color:#fff!important;box-shadow:0 8px 18px -8px rgba(5,150,105,.8)}
+.nav-cta:hover{background:var(--emerald-d)!important}
+.burger{display:none;margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:10px;width:42px;height:40px;align-items:center;justify-content:center;cursor:pointer}
+.burger svg{width:20px;height:20px;stroke:var(--ink-2)}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:650;font-size:.95rem;text-decoration:none;border-radius:11px;padding:12px 20px;border:1px solid transparent;cursor:pointer;transition:transform .16s,box-shadow .2s,background .2s,border-color .2s}
+.btn svg{width:17px;height:17px}
+.btn-primary{background:var(--emerald);color:#fff;box-shadow:0 14px 28px -14px rgba(5,150,105,.9)}
+.btn-primary:hover{background:var(--emerald-d);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:var(--shadow-sm)}
+.btn-ghost:hover{border-color:var(--emerald);color:var(--emerald-d);transform:translateY(-2px)}
+.btn-indigo{background:var(--indigo);color:#fff;box-shadow:0 14px 28px -14px rgba(79,70,229,.9)}
+.btn-indigo:hover{background:var(--indigo-d);transform:translateY(-2px)}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(900px 420px at 88% -12%,rgba(79,70,229,.10),transparent 62%),
+  radial-gradient(760px 380px at 2% 0%,rgba(5,150,105,.12),transparent 60%),
+  linear-gradient(180deg,#ffffff, #f7fafc)}
+.hero-in{display:grid;grid-template-columns:1.06fr .94fr;gap:52px;align-items:center;padding:72px 0 78px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--emerald-d);background:var(--emerald-tint);border:1px solid #b9f0d8;padding:6px 12px;border-radius:999px}
+.eyebrow svg{width:14px;height:14px}
+.hero h1{font-size:clamp(2.15rem,5vw,3.5rem);margin:18px 0 0;font-weight:800}
+.hero h1 .hl{color:var(--emerald)}
+.hero .lede{margin-top:18px;font-size:1.08rem;color:var(--ink-2);max-width:36em}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero-note{margin-top:16px;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.hero-note svg{width:15px;height:15px;color:var(--emerald)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.cbadge{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;padding:5px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm)}
+.cbadge svg{width:13px;height:13px;color:var(--emerald)}
+.cbadge.i svg{color:var(--indigo)}
+
+/* ---------- Invoice mock ---------- */
+.invoice-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden;position:relative}
+.invoice-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(180deg,var(--emerald),var(--indigo))}
+.inv-head{padding:20px 22px 16px;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.inv-head .who{font-weight:800;font-size:1rem}
+.inv-head .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.inv-tag{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald-d);background:var(--emerald-tint);border:1px solid #b9f0d8;border-radius:7px;padding:4px 9px;white-space:nowrap}
+.inv-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.inv-table th{text-align:left;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 22px;background:#fbfdff;border-bottom:1px solid var(--line)}
+.inv-table td{padding:10px 22px;border-bottom:1px solid var(--line-2)}
+.inv-table tr:last-child td{border-bottom:0}
+.inv-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.inv-table .hsn{font-size:.7rem;color:var(--muted)}
+.inv-foot{padding:14px 22px 18px;background:#fbfdff;border-top:1px solid var(--line)}
+.inv-row{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 0;color:var(--ink-2)}
+.inv-row.total{border-top:1px solid var(--line);margin-top:8px;padding-top:10px;font-weight:800;font-size:1rem;color:var(--ink)}
+.inv-row.total .amt{color:var(--emerald-d)}
+.pill-off{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;color:var(--indigo-d);background:var(--indigo-tint);border:1px solid #d5dbff;border-radius:999px;padding:4px 10px;margin-top:12px}
+.pill-off .dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(5,150,105,.16)}
+
+/* ---------- Section chrome ---------- */
+section{padding:76px 0}
+.sec-head{max-width:44em}
+.sec-kicker{font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald)}
+.sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);margin-top:10px}
+.sec-head p{margin-top:12px;color:var(--ink-2);font-size:1.02rem}
+.alt{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* ---------- Feature grid ---------- */
+.grid{display:grid;gap:18px;margin-top:42px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .24s,border-color .24s;position:relative}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#cfe9df}
+.card .ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--emerald-tint);border:1px solid #c6f0dd;margin-bottom:16px}
+.card .ico svg{width:23px;height:23px;color:var(--emerald-d)}
+.card .ico.i{background:var(--indigo-tint);border-color:#d9defc}
+.card .ico.i svg{color:var(--indigo)}
+.card h3{font-size:1.06rem}
+.card p{margin-top:9px;color:var(--ink-2);font-size:.93rem}
+.card .meta{margin-top:14px;font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
+
+/* ---------- Steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:42px;counter-reset:s}
+.step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px;position:relative;box-shadow:var(--shadow-sm)}
+.step::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:ui-monospace,monospace;font-size:.78rem;font-weight:800;color:var(--emerald-d);background:var(--emerald-tint);border:1px solid #b9f0d8;border-radius:8px;padding:3px 9px;display:inline-block}
+.step h3{margin-top:14px;font-size:1rem}
+.step p{margin-top:8px;font-size:.89rem;color:var(--ink-2)}
+
+/* ---------- Demo ---------- */
+.demo-shell{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;margin-top:40px}
+.demo-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fbfdff;border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}
+.dots i{width:11px;height:11px;border-radius:50%;display:block}
+.dots i:nth-child(1){background:#f87171}.dots i:nth-child(2){background:#fbbf24}.dots i:nth-child(3){background:#34d399}
+.url{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:.78rem;color:var(--muted);padding:6px 12px;font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.demo-frame{width:100%;height:560px;border:0;display:block;background:#fff}
+.demo-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:22px}
+
+/* ---------- Get started ---------- */
+.start-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;box-shadow:var(--shadow-sm)}
+.panel h3{font-size:1.08rem}
+.panel ol,.panel ul{margin:14px 0 0;padding-left:20px;color:var(--ink-2);font-size:.93rem}
+.panel li{margin-bottom:9px}
+pre{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:.82rem;overflow:auto;margin:16px 0 0;line-height:1.7}
+pre .c{color:#7dd3a8}
+pre .k{color:#93c5fd}
+.kbd{display:inline-block;background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:7px;padding:2px 8px;font-size:.78rem;font-weight:700;font-family:ui-monospace,monospace;color:var(--ink-2)}
+
+/* ---------- FAQ ---------- */
+.faq{margin-top:38px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden;box-shadow:var(--shadow-sm)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:last-child{border-bottom:0}
+.faq summary{cursor:pointer;list-style:none;padding:19px 24px;font-weight:650;font-size:1rem;display:flex;justify-content:space-between;gap:16px;align-items:center;transition:background .18s}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:hover{background:#fbfdff}
+.faq summary .chev{width:18px;height:18px;flex:0 0 auto;color:var(--emerald);transition:transform .22s}
+.faq details[open] summary .chev{transform:rotate(180deg)}
+.faq .ans{padding:0 24px 20px;color:var(--ink-2);font-size:.94rem}
+
+/* ---------- Footer ---------- */
+footer{background:#0f172a;color:#cbd5e1;padding:56px 0 30px}
+.f-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:32px}
+footer .brand{color:#fff}
+footer .brand small{color:var(--emerald-l)}
+footer p{font-size:.9rem;color:#94a3b8;margin-top:14px;max-width:34em}
+footer h4{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:#fff;margin-bottom:14px}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin-bottom:9px}
+footer a{color:#cbd5e1;text-decoration:none;font-size:.9rem}
+footer a:hover{color:var(--emerald-l)}
+.f-bottom{margin-top:38px;padding-top:22px;border-top:1px solid #1e293b;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;font-size:.85rem;color:#94a3b8}
+.f-bottom .made b{color:#fff}
+
+/* ---------- Reveal ---------- */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.22,.61,.36,1),transform .6s cubic-bezier(.22,.61,.36,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media(max-width:960px){
+  .hero-in{grid-template-columns:1fr;gap:40px;padding:52px 0 60px}
+  .g3{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .start-grid{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .nav-links{position:absolute;top:64px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:2px;padding:10px 16px 16px;display:none;box-shadow:var(--shadow)}
+  .nav-links.open{display:flex}
+  .burger{display:flex}
+  .g3,.steps{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr}
+  section{padding:56px 0}
+  .demo-frame{height:460px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M9 11h6M9 15h6"/></svg>
+      </span>
+      <span>SmartBill India<small>Serverless GST billing</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Toggle navigation" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav class="nav-links" id="navlinks">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#demo">Demo</a>
+      <a href="#start">Get started</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener">GitHub</a>
+      <a class="nav-cta" href="play/">Launch app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero" style="padding:0">
+  <div class="wrap hero-in">
+    <div>
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Runs entirely in your browser
+      </span>
+      <h1>Invoicing built for <span class="hl">Indian businesses.</span></h1>
+      <p class="lede">
+        <strong>SmartBill India</strong> is a fast, serverless, single-page billing and invoicing app.
+        Raise GST-ready tax invoices, quotations and proformas in seconds — no server, no signup,
+        and your data never leaves your device.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="play/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9z"/></svg>
+          Launch the app
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.94c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.78 1.2 1.78 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <p class="hero-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        No signup. No tracking. Works offline once loaded.
+      </p>
+
+      <div class="badges" aria-label="Key qualities">
+        <span class="cbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Vue 3</span>
+        <span class="cbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Serverless</span>
+        <span class="cbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Offline-first</span>
+        <span class="cbadge i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>GST ready</span>
+        <span class="cbadge i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>No signup</span>
+        <span class="cbadge i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Data stays local</span>
+      </div>
+
+      <div class="badges" style="margin-top:14px">
+        <a href="https://github.com/drsamonline/smartbill-app/stargazers" target="_blank" rel="noopener"><img src="https://img.shields.io/github/stars/drsamonline/smartbill-app?style=for-the-badge&amp;logo=github&amp;color=059669&amp;labelColor=0f172a" alt="GitHub stars" height="28" onerror="this.style.display='none'"></a>
+        <a href="https://github.com/drsamonline/smartbill-app/network/members" target="_blank" rel="noopener"><img src="https://img.shields.io/github/forks/drsamonline/smartbill-app?style=for-the-badge&amp;logo=github&amp;color=4f46e5&amp;labelColor=0f172a" alt="GitHub forks" height="28" onerror="this.style.display='none'"></a>
+        <a href="https://github.com/drsamonline/smartbill-app/blob/main/LICENSE" target="_blank" rel="noopener"><img src="https://img.shields.io/github/license/drsamonline/smartbill-app?style=for-the-badge&amp;color=059669&amp;labelColor=0f172a" alt="License" height="28" onerror="this.style.display='none'"></a>
+        <a href="https://github.com/drsamonline/smartbill-app/commits/main" target="_blank" rel="noopener"><img src="https://img.shields.io/github/last-commit/drsamonline/smartbill-app?style=for-the-badge&amp;logo=git&amp;color=4f46e5&amp;labelColor=0f172a" alt="Last commit" height="28" onerror="this.style.display='none'"></a>
+        <a href="https://github.com/drsamonline/smartbill-app/issues" target="_blank" rel="noopener"><img src="https://img.shields.io/github/issues/drsamonline/smartbill-app?style=for-the-badge&amp;logo=github&amp;color=059669&amp;labelColor=0f172a" alt="Issues" height="28" onerror="this.style.display='none'"></a>
+        <a href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener"><img src="https://img.shields.io/github/languages/top/drsamonline/smartbill-app?style=for-the-badge&amp;color=4f46e5&amp;labelColor=0f172a" alt="Top language" height="28" onerror="this.style.display='none'"></a>
+      </div>
+    </div>
+
+    <!-- Invoice-card motif -->
+    <div class="invoice-card reveal" aria-hidden="true">
+      <div class="inv-head">
+        <div>
+          <div class="who">Shree Traders Pvt. Ltd.</div>
+          <div class="sub">GSTIN 27AABCS1429B1Z8 &middot; Maharashtra (27)</div>
+        </div>
+        <span class="inv-tag">Tax Invoice</span>
+      </div>
+      <table class="inv-table">
+        <thead>
+          <tr><th>Item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Consulting services<br><span class="hsn">SAC 9983</span></td><td class="num">10</td><td class="num">₹9,500</td><td class="num">₹95,000</td></tr>
+          <tr><td>Annual maintenance<br><span class="hsn">SAC 9987</span></td><td class="num">2</td><td class="num">₹14,500</td><td class="num">₹29,000</td></tr>
+        </tbody>
+      </table>
+      <div class="inv-foot">
+        <div class="inv-row"><span>Subtotal</span><span class="mono">₹1,24,000.00</span></div>
+        <div class="inv-row"><span>CGST @ 9%</span><span class="mono">₹11,160.00</span></div>
+        <div class="inv-row"><span>SGST @ 9%</span><span class="mono">₹11,160.00</span></div>
+        <div class="inv-row total"><span>Total</span><span class="amt mono">₹1,46,320.00</span></div>
+        <span class="pill-off"><span class="dot"></span>Saved locally to IndexedDB</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">Why SmartBill</div>
+      <h2>Everything a small Indian business needs to bill — and nothing it doesn't.</h2>
+      <p>Built as a single self-contained page, so there is no backend to run, no database to pay for, and no account to manage.</p>
+    </div>
+    <div class="grid g3">
+      <article class="card reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="8" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="10" cy="17" r="2" fill="currentColor" stroke="none"/></svg></div>
+        <h3>100% serverless</h3>
+        <p>No backend, no database, no hosting bill. The entire app is one HTML file that runs in your browser — deploy it anywhere, even from a USB stick.</p>
+        <div class="meta">Zero infrastructure</div>
+      </article>
+      <article class="card reveal">
+        <div class="ico i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a7 7 0 0 1 14 0"/><path d="M2 9.5a11 11 0 0 1 20 0"/><path d="M8.5 15.5a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/></svg></div>
+        <h3>Works offline, always</h3>
+        <p>Once loaded, SmartBill keeps working with no internet. Invoices and masters live in your browser's native IndexedDB, so a dropped connection never stops a sale.</p>
+        <div class="meta">IndexedDB storage</div>
+      </article>
+      <article class="card reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></div>
+        <h3>Indian GST, done properly</h3>
+        <p>HSN/SAC codes, CGST &amp; SGST split, state codes and reverse-charge mechanics are built into the invoice, so your tax invoice is correct the first time.</p>
+        <div class="meta">HSN / SAC &middot; CGST &middot; SGST</div>
+      </article>
+      <article class="card reveal">
+        <div class="ico i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 3 5 3 5 1.1 5 3-2.2 3-5 3-5-1.1-5-3"/></svg></div>
+        <h3>No signup, no account</h3>
+        <p>Open the page and start billing. There is nothing to register, no email to verify, no password to remember — and no trial clock ticking.</p>
+        <div class="meta">Open and go</div>
+      </article>
+      <article class="card reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9.5 11.5l1.8 1.8 3.5-3.6"/></svg></div>
+        <h3>Your data stays on your device</h3>
+        <p>Nothing is uploaded, synced or shared. Your customers, rates and invoices never leave the browser — take a JSON backup whenever you like.</p>
+        <div class="meta">Private by design</div>
+      </article>
+      <article class="card reveal">
+        <div class="ico i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 13h6M10 17h4"/></svg></div>
+        <h3>Print-ready documents</h3>
+        <p>Generate Tax Invoices, Quotations and Proforma Invoices on a strict A4 grid — then print directly or export to Microsoft Word (.doc) in one click.</p>
+        <div class="meta">A4 print &middot; .doc export</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section id="how" class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">How it works</div>
+      <h2>From blank page to a printed tax invoice in four steps.</h2>
+      <p>All four steps happen inside your browser. Nothing is sent anywhere, and you can repeat them offline.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Set up your master</h3>
+        <p>Add your company profile, bank details, GSTIN and terms once. Upload your logo, signature and payment QR, and pre-load frequent items with rates, HSN codes and tax brackets.</p>
+      </div>
+      <div class="step reveal">
+        <h3>Create the invoice</h3>
+        <p>Pick a document type and pull items from your master list. CGST, SGST and totals calculate live as you type — no spreadsheet, no manual maths.</p>
+      </div>
+      <div class="step reveal">
+        <h3>Save to history</h3>
+        <p>Store the invoice in your local database and revisit it any time. Every past document stays available in the History tab, on your device.</p>
+      </div>
+      <div class="step reveal">
+        <h3>Preview, print, export</h3>
+        <p>Check the A4 preview, then print it or download it as a Word file. Take a JSON backup regularly so a cleared cache never costs you data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DEMO ================= -->
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">Live demo</div>
+      <h2>The real app, running right here.</h2>
+      <p>This is SmartBill India itself — the same single-page app that ships in the repository, embedded below. Give it a try, or open it full-screen.</p>
+    </div>
+    <div class="demo-shell reveal">
+      <div class="demo-bar">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="url">drsamonline.github.io/smartbill-app/play/</span>
+      </div>
+      <iframe class="demo-frame" src="play/" title="SmartBill India live application demo" loading="lazy"></iframe>
+    </div>
+    <div class="demo-actions">
+      <a class="btn btn-primary" href="play/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+        Open the app full-screen
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener">Browse the source</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GET STARTED ================= -->
+<section id="start" class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">Get started</div>
+      <h2>Use it in the browser, or run your own copy.</h2>
+      <p>There is no build step and no dependency install — the whole application is a single HTML file.</p>
+    </div>
+    <div class="start-grid">
+      <div class="panel reveal">
+        <h3>Option 1 — Use it right now</h3>
+        <ol>
+          <li>Open the <a href="play/" style="color:var(--emerald-d);font-weight:650">live app</a> in any modern browser.</li>
+          <li>Go to <span class="kbd">Master &amp; Settings</span> and fill in your company details.</li>
+          <li>Head to <span class="kbd">New Invoice</span> and raise your first bill.</li>
+          <li>Print or export from <span class="kbd">Preview &amp; Export</span>.</li>
+        </ol>
+        <p style="margin-top:14px;font-size:.88rem;color:var(--muted)">Works in Chrome, Edge, Firefox and Safari. No install, no signup.</p>
+      </div>
+      <div class="panel reveal">
+        <h3>Option 2 — Host your own copy</h3>
+        <pre><span class="c"># Clone the repository</span>
+<span class="k">git</span> clone https://github.com/drsamonline/smartbill-app.git
+<span class="k">cd</span> smartbill-app
+
+<span class="c"># The app is a single file — just open it</span>
+<span class="k">open</span> index.html   <span class="c"># or double-click it</span></pre>
+        <p style="margin-top:14px;font-size:.88rem;color:var(--muted)">Deploy <span class="kbd">index.html</span> to any static host — GitHub Pages, Netlify, or a plain web server. Nothing else is required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">FAQ</div>
+      <h2>Questions people ask before their first invoice.</h2>
+    </div>
+    <div class="faq reveal">
+      <details open>
+        <summary>Where is my data stored? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">Everything lives in your browser's native IndexedDB on the device you are using. Nothing is uploaded to a server, and SmartBill has no backend at all. That also means your data does not automatically follow you to another device or browser.</div>
+      </details>
+      <details>
+        <summary>Do I need to create an account or sign up? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">No. There is no signup, no login and no email required. Open the page and start billing immediately.</div>
+      </details>
+      <details>
+        <summary>Does it work without internet? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">Yes. Once the page has loaded, the app runs fully offline because all logic and data are local. The only thing an internet connection is needed for is the very first load of the page and its CDN libraries.</div>
+      </details>
+      <details>
+        <summary>Is it compliant for Indian GST invoices? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">SmartBill provides the fields Indian businesses need — HSN/SAC codes, CGST and SGST split, state codes and reverse-charge handling — and produces a clean A4 tax-invoice layout. You should still confirm the exact format your business requires with your accountant, as SmartBill is a tool, not tax advice.</div>
+      </details>
+      <details>
+        <summary>What happens if I clear my browser data? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">Clearing your browser cache or using aggressive system cleaners will permanently delete your saved invoices and master settings. Use the built-in <strong>Download Backup (.json)</strong> button regularly and keep a copy of that file somewhere safe.</div>
+      </details>
+      <details>
+        <summary>Can I export an invoice to edit elsewhere? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">Yes. From the Preview &amp; Export tab you can print the A4 document directly, export it to Microsoft Word (.doc), or take a full JSON backup of your database.</div>
+      </details>
+      <details>
+        <summary>Is it free to use? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="ans">The project is released under a custom dual license — free for individual and non-commercial use, with a paid license required for commercial or business use. See the LICENSE file in the repository for the exact terms.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <a class="brand" href="#top">
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M9 11h6M9 15h6"/></svg>
+          </span>
+          <span>SmartBill India<small>Serverless GST billing</small></span>
+        </a>
+        <p>A fast, serverless, single-page billing and invoicing app for Indian businesses. GST-ready, offline-first, and private by design.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#demo">Live demo</a></li>
+          <li><a href="#start">Get started</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="play/">Launch the app</a></li>
+          <li><a href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://github.com/drsamonline/smartbill-app/blob/main/LICENSE" target="_blank" rel="noopener">License</a></li>
+          <li><a href="https://github.com/drsamonline/smartbill-app/issues" target="_blank" rel="noopener">Issues &amp; support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span class="made">Built by <b>Dr. Sohil Momin</b></span>
+      <span>&copy; <span id="yr">2026</span> SmartBill India &middot; <a href="https://github.com/drsamonline/smartbill-app" target="_blank" rel="noopener">github.com/drsamonline/smartbill-app</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Mobile nav
+  var burger = document.getElementById('burger');
+  var links = document.getElementById('navlinks');
+  if (burger && links){
+    burger.addEventListener('click', function(){
+      var open = links.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    links.addEventListener('click', function(e){
+      if (e.target.tagName === 'A'){ links.classList.remove('open'); burger.setAttribute('aria-expanded','false'); }
+    });
+  }
+  // Year
+  var yr = document.getElementById('yr');
+  if (yr){ yr.textContent = new Date().getFullYear(); }
+
+  // Scroll reveal (respects reduced motion via CSS + JS guard)
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)){
+    for (var i=0;i<items.length;i++) items[i].classList.add('in');
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    for (var j=0;j<items.length;j++) io.observe(items[j]);
+  }
+})();
+</script>
+</body>
+</html>

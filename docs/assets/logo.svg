@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SmartBill India">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#059669"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <path d="M168 96h120l72 72v248H168z" fill="none" stroke="#ffffff" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M288 96v72h72" fill="none" stroke="#ffffff" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M214 250h120M214 312h120" stroke="#ffffff" stroke-width="26" stroke-linecap="round"/>
+  <path d="M214 374h72" stroke="#4f46e5" stroke-width="26" stroke-linecap="round"/>
+</svg>
