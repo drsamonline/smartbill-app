@@ -4,18 +4,18 @@
 
 **A fast, serverless, single-page billing and invoicing app for Indian businesses — GST-ready, offline-first, and private by design.**
 
-[![Stars](https://img.shields.io/github/stars/drsamonline/smartbill-app?style=for-the-badge&logo=github&color=059669&labelColor=0f172a)](https://github.com/drsamonline/smartbill-app/stargazers)
-[![Forks](https://img.shields.io/github/forks/drsamonline/smartbill-app?style=for-the-badge&logo=github&color=4f46e5&labelColor=0f172a)](https://github.com/drsamonline/smartbill-app/network/members)
-[![License](https://img.shields.io/github/license/drsamonline/smartbill-app?style=for-the-badge&color=059669&labelColor=0f172a)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/drsamonline/smartbill-app?style=for-the-badge&logo=git&color=4f46e5&labelColor=0f172a)](https://github.com/drsamonline/smartbill-app/commits/main)
-[![Issues](https://img.shields.io/github/issues/drsamonline/smartbill-app?style=for-the-badge&logo=github&color=059669&labelColor=0f172a)](https://github.com/drsamonline/smartbill-app/issues)
+[![Stars](https://img.shields.io/github/stars/drsamonline/smartbill-app
+[![Forks](https://img.shields.io/github/forks/drsamonline/smartbill-app
+[![License](https://img.shields.io/github/license/drsamonline/smartbill-app
+[![Last commit](https://img.shields.io/github/last-commit/drsamonline/smartbill-app
+[![Issues](https://img.shields.io/github/issues/drsamonline/smartbill-app
 
-[![Vue 3](https://img.shields.io/badge/Vue-3-4f46e5?style=flat-square&logo=vuedotjs&logoColor=white)](#)
-[![Serverless](https://img.shields.io/badge/Serverless-100%25-059669?style=flat-square)](#)
-[![Offline-first](https://img.shields.io/badge/Offline--first-IndexedDB-4f46e5?style=flat-square)](#)
-[![GST ready](https://img.shields.io/badge/GST-ready-059669?style=flat-square)](#)
-[![No signup](https://img.shields.io/badge/No-signup-4f46e5?style=flat-square)](#)
-[![Data stays local](https://img.shields.io/badge/Data-stays%20local-059669?style=flat-square)](#)
+[![Vue 3](https://img.shields.io/badge/Vue-3-4f46e5
+[![Serverless](https://img.shields.io/badge/Serverless-100%25-059669
+[![Offline-first](https://img.shields.io/badge/Offline--first-IndexedDB-4f46e5
+[![GST ready](https://img.shields.io/badge/GST-ready-059669
+[![No signup](https://img.shields.io/badge/No-signup-4f46e5
+[![Data stays local](https://img.shields.io/badge/Data-stays%20local-059669
 
 ### 🔗 Quick links
 
@@ -25,7 +25,6 @@
 
 ---
 
-# 🚀 SMARTBILL INDIA - PRO BILLING v1.0
 
 [![License: Dual](https://img.shields.io/badge/License-Custom%20Dual-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen.svg)]()
@@ -76,7 +75,7 @@ These instructions will guide you through setting up and using the SmartBill app
 3. Simply double-click the `index.html` file to open it in your browser.
 
 OR
-See it live in action here -> [![Live Demo](https://shields.io)](https://drsamonline.github.io/smartbill-app/)
+See it live in action here -> [![Live Demo](https://shields.io)](https://drsamonline.github.io/smartbill-app/play/)
 
 
 ### 🛠️ Usage
