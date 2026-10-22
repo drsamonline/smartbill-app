@@ -21,6 +21,8 @@
 
 **[🌐 Landing page](https://drsamonline.github.io/smartbill-app/)** &nbsp;·&nbsp; **[▶️ Live app](https://drsamonline.github.io/smartbill-app/play/)** &nbsp;·&nbsp; **[📦 Source](https://github.com/drsamonline/smartbill-app)**
 
+**Download:** [Windows (.exe)](https://github.com/drsamonline/smartbill-app/releases/latest/download/smartbill-app-portable.exe) &nbsp;·&nbsp; [Android (.apk)](https://github.com/drsamonline/smartbill-app/releases/latest/download/smartbill-app.apk)
+
 </div>
 
 ---
