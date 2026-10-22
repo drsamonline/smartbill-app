@@ -5,6 +5,7 @@
 **A fast, serverless, single-page billing and invoicing app for Indian businesses — GST-ready, offline-first, and private by design.**
 
 [![Stars](https://img.shields.io/github/stars/drsamonline/smartbill-app)](https://github.com/drsamonline/smartbill-app/stargazers)
+[![All projects](https://img.shields.io/badge/All%20projects-hub-059669)](https://drsamonline.github.io/)
 [![Forks](https://img.shields.io/github/forks/drsamonline/smartbill-app)](https://github.com/drsamonline/smartbill-app/network/members)
 [![License: Custom Dual](https://img.shields.io/badge/license-custom%20dual-059669)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/drsamonline/smartbill-app)](https://github.com/drsamonline/smartbill-app/commits/main)
