@@ -64,6 +64,7 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">GSTIN</label>
                     <input v-model="master.gstin" class="w-full border p-2 rounded uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p v-if="companyGstinWarning" class="text-xs text-amber-600 mt-1"><i class="fas fa-triangle-exclamation mr-1"></i>This does not look like a valid 15-character GSTIN.</p>
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold mb-1">Address</label>
@@ -139,8 +140,8 @@
                             <td class="border p-1"><input v-model="mi.name" class="w-full p-1 border-b focus:outline-none focus:border-blue-500" placeholder="Item Name"></td>
                             <td class="border p-1"><input v-model="mi.hsn" class="w-full p-1 text-center border-b focus:outline-none"></td>
                             <td class="border p-1"><input v-model="mi.unit" class="w-full p-1 text-center border-b focus:outline-none"></td>
-                            <td class="border p-1"><input type="number" step="0.01" v-model.number="mi.rate" class="w-full p-1 text-right border-b focus:outline-none"></td>
-                            <td class="border p-1"><input type="number" step="0.01" v-model.number="mi.tax" class="w-full p-1 text-right border-b focus:outline-none"></td>
+                            <td class="border p-1"><input type="number" min="0" step="0.01" v-model.number="mi.rate" @change="sanitizeNumber(mi, 'rate')" class="w-full p-1 text-right border-b focus:outline-none"></td>
+                            <td class="border p-1"><input type="number" min="0" step="0.01" v-model.number="mi.tax" @change="sanitizeNumber(mi, 'tax')" class="w-full p-1 text-right border-b focus:outline-none"></td>
                             <td class="border p-1 text-center">
                                 <button @click="removeMasterItem(idx)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
                             </td>
@@ -207,6 +208,7 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">Customer GSTIN</label>
                     <input v-model="invoice.customerGstin" class="w-full border p-2 rounded uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p v-if="customerGstinWarning" class="text-xs text-amber-600 mt-1"><i class="fas fa-triangle-exclamation mr-1"></i>This does not look like a valid 15-character GSTIN.</p>
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold mb-1">Customer Address</label>
@@ -225,6 +227,10 @@
             </div>
 
             <!-- Items Table -->
+            <datalist id="master-items-list">
+                <option v-for="mi in master.itemsList" :value="mi.name" :key="mi.id"></option>
+            </datalist>
+            <p class="text-xs text-gray-500 italic">Sub-item qty &amp; rate are informational only (ref) and are not included in any total.</p>
             <div class="overflow-x-auto custom-scroll">
                 <table class="w-full text-sm border-collapse">
                     <thead class="bg-gray-200 text-gray-700">
@@ -248,16 +254,13 @@
                                 <td class="border p-1 text-center font-bold">{{ index + 1 }}</td>
                                 <td class="border p-1">
                                     <input v-model="item.description" list="master-items-list" @change="autoFillItem(item)" class="w-full font-semibold border-b focus:outline-none focus:border-blue-500 p-1" placeholder="Main Item Name...">
-                                    <datalist id="master-items-list">
-                                        <option v-for="mi in master.itemsList" :value="mi.name" :key="mi.id"></option>
-                                    </datalist>
                                 </td>
                                 <td class="border p-1"><input v-model="item.hsn" class="w-full text-center border-b focus:outline-none p-1"></td>
-                                <td class="border p-1"><input type="number" v-model.number="item.qty" class="w-full text-center border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" min="0" v-model.number="item.qty" @change="sanitizeNumber(item, 'qty')" class="w-full text-center border-b focus:outline-none p-1"></td>
                                 <td class="border p-1"><input v-model="item.unit" class="w-full text-center border-b focus:outline-none p-1"></td>
-                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.rate" class="w-full text-right border-b focus:outline-none p-1"></td>
-                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.disc" class="w-full text-right border-b focus:outline-none p-1"></td>
-                                <td class="border p-1"><input type="number" step="0.01" v-model.number="item.tax" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" min="0" step="0.01" v-model.number="item.rate" @change="sanitizeNumber(item, 'rate')" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" min="0" max="100" step="0.01" v-model.number="item.disc" @change="sanitizeNumber(item, 'disc', 0, 100)" class="w-full text-right border-b focus:outline-none p-1"></td>
+                                <td class="border p-1"><input type="number" min="0" step="0.01" v-model.number="item.tax" @change="sanitizeNumber(item, 'tax')" class="w-full text-right border-b focus:outline-none p-1"></td>
                                 <td class="border p-1 text-right font-bold bg-gray-50">₹{{ getRowTotal(item).toFixed(2) }}</td>
                                 <td class="border p-1 text-center no-print space-x-1">
                                     <button @click="addSubItem(index)" class="text-blue-600 hover:text-blue-800 text-xs font-semibold" title="Add Sub-item"><i class="fas fa-plus-circle mr-1"></i>Sub</button>
@@ -275,9 +278,14 @@
                                     </div>
                                 </td>
                                 <td class="border p-1"><input v-model="sub.hsn" class="w-full text-center text-sm border-b focus:outline-none p-1 bg-transparent"></td>
-                                <td class="border p-1"><input type="number" v-model.number="sub.qty" class="w-full text-center text-sm border-b focus:outline-none p-1 bg-transparent"></td>
+                                <td class="border p-1" title="Informational only - not included in totals"><input type="number" min="0" v-model.number="sub.qty" @change="sanitizeNumber(sub, 'qty')" class="w-full text-center text-sm border-b focus:outline-none p-1 bg-transparent"></td>
                                 <td class="border p-1 text-center text-gray-400 text-sm">-</td>
-                                <td class="border p-1"><input type="number" step="0.01" v-model.number="sub.rate" class="w-full text-right text-sm border-b focus:outline-none p-1 bg-transparent"></td>
+                                <td class="border p-1" title="Informational only - not included in totals">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <input type="number" min="0" step="0.01" v-model.number="sub.rate" @change="sanitizeNumber(sub, 'rate')" class="w-full text-right text-sm border-b focus:outline-none p-1 bg-transparent">
+                                        <span class="text-[10px] text-gray-400 italic flex-shrink-0">(ref)</span>
+                                    </div>
+                                </td>
                                 <td class="border p-1 text-center text-gray-400 text-sm">-</td>
                                 <td class="border p-1 text-center text-gray-400 text-sm">-</td>
                                 <td class="border p-1 text-right font-semibold text-gray-400 text-sm">-</td>
@@ -302,8 +310,13 @@
                     <div class="flex justify-between"><span class="text-gray-600">Subtotal (Taxable):</span> <span>₹{{ totalTaxable.toFixed(2) }}</span></div>
                     <div class="flex justify-between text-red-600" v-if="totalDiscount > 0"><span>Total Discount:</span> <span>- ₹{{ totalDiscount.toFixed(2) }}</span></div>
                     
-                    <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
-                    <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+                    <template v-if="isInterState">
+                        <div class="flex justify-between text-blue-700"><span>IGST:</span> <span>₹{{ totalIGST.toFixed(2) }}</span></div>
+                    </template>
+                    <template v-else>
+                        <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
+                        <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+                    </template>
 
                     <div class="flex justify-between text-xl font-bold border-t-2 border-gray-800 pt-2 mt-2">
                         <span>Grand Total:</span> <span>₹{{ grandTotal.toFixed(2) }}</span>
@@ -415,6 +428,9 @@
                             <th class="border border-gray-400 p-2 w-20 text-right">Tax</th>
                             <th class="border border-gray-400 p-2 w-28 text-right">Amount</th>
                         </tr>
+                        <tr>
+                            <td colspan="9" class="border border-gray-400 px-2 py-1 text-[10px] normal-case italic text-gray-500 text-left">Sub-item (↳) qty &amp; rate are informational (ref) only and are not part of the amounts billed.</td>
+                        </tr>
                     </thead>
                     <tbody>
                         <template v-for="(item, index) in invoice.items" :key="item.id">
@@ -425,11 +441,11 @@
                                     <div class="font-bold text-gray-900">{{ item.description || 'Item' }}</div>
                                 </td>
                                 <td class="border border-gray-400 p-2 text-center">{{ item.hsn }}</td>
-                                <td class="border border-gray-400 p-2 text-center">{{ item.qty }}</td>
+                                <td class="border border-gray-400 p-2 text-center">{{ Number(item.qty) || 0 }}</td>
                                 <td class="border border-gray-400 p-2 text-center">{{ item.unit }}</td>
-                                <td class="border border-gray-400 p-2 text-right">{{ item.rate.toFixed(2) }}</td>
-                                <td class="border border-gray-400 p-2 text-right">{{ item.disc }}%</td>
-                                <td class="border border-gray-400 p-2 text-right">{{ item.tax }}%</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ (Number(item.rate) || 0).toFixed(2) }}</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ Number(item.disc) || 0 }}%</td>
+                                <td class="border border-gray-400 p-2 text-right">{{ Number(item.tax) || 0 }}%</td>
                                 <td class="border border-gray-400 p-2 text-right font-bold">₹{{ getRowTotal(item).toFixed(2) }}</td>
                             </tr>
                             <!-- Sub Items Print Rows -->
@@ -439,9 +455,9 @@
                                     <div class="text-gray-700 pl-4 text-sm font-medium">↳ {{ sub.description || 'Sub-item' }}</div>
                                 </td>
                                 <td class="border border-gray-400 p-2 text-center text-xs">{{ sub.hsn }}</td>
-                                <td class="border border-gray-400 p-2 text-center text-xs">{{ sub.qty || 0 }}</td>
+                                <td class="border border-gray-400 p-2 text-center text-xs">{{ Number(sub.qty) || 0 }}</td>
                                 <td class="border border-gray-400 p-2 text-center text-gray-400 text-xs">-</td>
-                                <td class="border border-gray-400 p-2 text-right text-xs">{{ sub.rate ? sub.rate.toFixed(2) : '0.00' }}</td>
+                                <td class="border border-gray-400 p-2 text-right text-xs">{{ (Number(sub.rate) || 0).toFixed(2) }} <span class="text-gray-400 italic">(ref)</span></td>
                                 <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
                                 <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
                                 <td class="border border-gray-400 p-2 text-right text-gray-400 text-xs">-</td>
@@ -473,8 +489,13 @@
                     <div class="w-1/2 space-y-2 text-right text-sm">
                         <div class="flex justify-between"><span class="text-gray-600">Subtotal (Taxable):</span> <span>₹{{ totalTaxable.toFixed(2) }}</span></div>
                         <div class="flex justify-between text-red-600" v-if="totalDiscount > 0"><span>Total Discount:</span> <span>- ₹{{ totalDiscount.toFixed(2) }}</span></div>
-                        <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
-                        <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+                        <template v-if="isInterState">
+                            <div class="flex justify-between text-blue-700"><span>IGST:</span> <span>₹{{ totalIGST.toFixed(2) }}</span></div>
+                        </template>
+                        <template v-else>
+                            <div class="flex justify-between text-blue-700"><span>CGST:</span> <span>₹{{ totalCGST.toFixed(2) }}</span></div>
+                            <div class="flex justify-between text-blue-700"><span>SGST:</span> <span>₹{{ totalSGST.toFixed(2) }}</span></div>
+                        </template>
                         <div class="flex justify-between text-xl font-bold border-t-2 border-black pt-2 mt-2">
                             <span>Grand Total:</span> <span>₹{{ grandTotal.toFixed(2) }}</span>
                         </div>
@@ -590,7 +611,21 @@
             const savedInvoices = ref([]);
 
             const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
-            const getNewInvoiceNumber = () => `INV-${new Date().getFullYear()}-${String(savedInvoices.value.length + 1).padStart(3, '0')}`;
+            const editingIndex = ref(null);
+
+            const getNewInvoiceNumber = () => {
+                const year = new Date().getFullYear();
+                const prefix = `INV-${year}-`;
+                const maxSeq = savedInvoices.value.reduce((max, inv) => {
+                    const number = String(inv && inv.number || '');
+                    if (!number.startsWith(prefix)) return max;
+                    const match = number.slice(prefix.length).match(/(\d+)\s*$/);
+                    if (!match) return max;
+                    const seq = parseInt(match[1], 10);
+                    return isNaN(seq) ? max : Math.max(max, seq);
+                }, 0);
+                return `${prefix}${String(maxSeq + 1).padStart(3, '0')}`;
+            };
 
             const invoice = reactive({
                 type: 'Tax Invoice',
@@ -637,7 +672,7 @@
             // --- GATED WATCHERS (Prevents overwriting DB with defaults on load) ---
             watch(master, async (newVal) => {
                 if (!isLoaded.value) return;
-                try { await saveToDB('master', newVal); } 
+                try { await saveToDB('master', newVal); quotaAlertShown.value = false; } 
                 catch (e) { 
                     console.error("Save master failed", e); 
                     if (e.name === 'QuotaExceededError' && !quotaAlertShown.value) {
@@ -649,7 +684,7 @@
 
             watch(savedInvoices, async (newVal) => {
                 if (!isLoaded.value) return;
-                try { await saveToDB('invoices', newVal); } 
+                try { await saveToDB('invoices', newVal); quotaAlertShown.value = false; } 
                 catch (e) { 
                     console.error("Save invoices failed", e);
                     if (e.name === 'QuotaExceededError' && !quotaAlertShown.value) {
@@ -659,44 +694,95 @@
                 }
             }, { deep: true });
 
-            // --- STRICTLY MAIN ITEM CALCULATIONS (No IGST, Permanent 50/50 Split) ---
-            const getRowTaxable = (row) => (row.rate * row.qty) - ((row.rate * row.qty * row.disc) / 100);
-            const getRowTax = (row) => (getRowTaxable(row) * row.tax) / 100;
+            // --- STRICTLY MAIN ITEM CALCULATIONS (sub-items never affect totals) ---
+            const toNum = (v) => Number(v) || 0;
+            const getRowTaxable = (row) => {
+                const gross = toNum(row.rate) * toNum(row.qty);
+                return gross - ((gross * toNum(row.disc)) / 100);
+            };
+            const getRowTax = (row) => (getRowTaxable(row) * toNum(row.tax)) / 100;
             const getRowTotal = (row) => getRowTaxable(row) + getRowTax(row);
 
             const totalTaxable = computed(() => invoice.items.reduce((sum, item) => sum + getRowTaxable(item), 0));
-            const totalDiscount = computed(() => invoice.items.reduce((sum, item) => sum + ((item.rate * item.qty * item.disc) / 100), 0));
+            const totalDiscount = computed(() => invoice.items.reduce((sum, item) => sum + ((toNum(item.rate) * toNum(item.qty) * toNum(item.disc)) / 100), 0));
             
             // Total tax from main items only
             const totalTax = computed(() => invoice.items.reduce((sum, item) => sum + getRowTax(item), 0));
+
+            // Inter-state supply => IGST, intra-state (or unspecified) => CGST + SGST
+            const isInterState = computed(() => {
+                const place = String(invoice.placeOfSupply || '').trim().toLowerCase();
+                if (!place) return false;
+                const homeState = String(master.state || '').trim().toLowerCase();
+                const homeCode = String(master.stateCode || '').trim().toLowerCase();
+                if (homeCode && place === homeCode) return false;
+                if (homeState && place === homeState) return false;
+                if (!homeState && !homeCode) return false;
+                return true;
+            });
+
+            const totalIGST = computed(() => isInterState.value ? totalTax.value : 0);
+            const totalCGST = computed(() => isInterState.value ? 0 : totalTax.value / 2);
+            const totalSGST = computed(() => isInterState.value ? 0 : totalTax.value / 2);
             
-            // Permanent 50/50 split
-            const totalCGST = computed(() => totalTax.value / 2);
-            const totalSGST = computed(() => totalTax.value / 2);
-            
-            const grandTotal = computed(() => totalTaxable.value + totalCGST.value + totalSGST.value);
+            const grandTotal = computed(() => totalTaxable.value + totalCGST.value + totalSGST.value + totalIGST.value);
+
+            // --- VALIDATION ---
+            const sanitizeNumber = (row, field, min = 0, max = null) => {
+                let value = Number(row[field]);
+                if (!isFinite(value)) value = min;
+                if (value < min) value = min;
+                if (max !== null && value > max) value = max;
+                row[field] = value;
+            };
+
+            const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+            const isGstinInvalid = (value) => {
+                const gstin = String(value || '').trim().toUpperCase();
+                return gstin.length > 0 && !GSTIN_REGEX.test(gstin);
+            };
+            const customerGstinWarning = computed(() => isGstinInvalid(invoice.customerGstin));
+            const companyGstinWarning = computed(() => isGstinInvalid(master.gstin));
+
+            const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            const twoDigitsToWords = (n) => {
+                if (n < 20) return ONES[n];
+                return n % 10 ? TENS[Math.floor(n / 10)] + ' ' + ONES[n % 10] : TENS[Math.floor(n / 10)];
+            };
+
+            // Indian convention: 'and' before the trailing tens/units of a group (e.g. One Hundred and Five)
+            const threeDigitsToWords = (n) => {
+                const parts = [];
+                if (n >= 100) parts.push(ONES[Math.floor(n / 100)] + ' Hundred');
+                const rest = n % 100;
+                if (rest) parts.push((parts.length ? 'and ' : '') + twoDigitsToWords(rest));
+                return parts.join(' ');
+            };
 
             const totalInWords = computed(() => {
-                const num = Number(grandTotal.value);
-                if (isNaN(num)) return 'Zero Rupees Only';
-                if (num === 0) return 'Zero Rupees Only';
-                const [rupees, paise] = num.toFixed(2).split('.');
-                let result = '';
-                const a = ['','One ','Two ','Three ','Four ','Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
-                const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-                const convert = (n) => n > 19 ? b[Math.floor(n / 10)] + ' ' + a[n % 10] : a[n];
+                const amount = Number(grandTotal.value);
+                if (isNaN(amount) || amount === 0) return 'Zero Rupees Only';
+                const [rupees, paise] = amount.toFixed(2).split('.');
+                const words = [];
 
-                let numInt = parseInt(rupees);
+                let numInt = parseInt(rupees, 10);
                 if (numInt > 0) {
-                    if (numInt >= 10000000) { result += convert(Math.floor(numInt / 10000000)) + 'Crore '; numInt %= 10000000; }
-                    if (numInt >= 100000) { result += convert(Math.floor(numInt / 100000)) + 'Lakh '; numInt %= 100000; }
-                    if (numInt >= 1000) { result += convert(Math.floor(numInt / 1000)) + 'Thousand '; numInt %= 1000; }
-                    if (numInt >= 100) { result += convert(Math.floor(numInt / 100)) + 'Hundred '; numInt %= 100; }
-                    if (numInt > 0) result += (result ? 'and ' : '') + convert(numInt);
-                    result += 'Rupees ';
+                    const crore = Math.floor(numInt / 10000000); numInt %= 10000000;
+                    const lakh = Math.floor(numInt / 100000); numInt %= 100000;
+                    const thousand = Math.floor(numInt / 1000); numInt %= 1000;
+                    if (crore) words.push(threeDigitsToWords(crore) + ' Crore');
+                    if (lakh) words.push(threeDigitsToWords(lakh) + ' Lakh');
+                    if (thousand) words.push(threeDigitsToWords(thousand) + ' Thousand');
+                    if (numInt) words.push((words.length && numInt < 100 ? 'and ' : '') + threeDigitsToWords(numInt));
+                    words.push('Rupees');
                 }
-                if (parseInt(paise) > 0) result += (result ? 'and ' : '') + convert(parseInt(paise)) + 'Paise ';
-                return (result || 'Zero') + 'Only';
+
+                const paiseInt = parseInt(paise, 10);
+                if (paiseInt > 0) words.push((words.length ? 'and ' : '') + twoDigitsToWords(paiseInt) + ' Paise');
+
+                return (words.length ? words.join(' ') : 'Zero') + ' Only';
             });
 
             // --- ACTIONS ---
@@ -713,7 +799,7 @@
                 if (found) {
                     row.hsn = found.hsn;
                     // Only apply unit/tax to main items to prevent data model pollution
-                    if (!Array.isArray(row.subItems)) {
+                    if (Array.isArray(row.subItems)) {
                         row.unit = found.unit;
                         row.tax = found.tax;
                     }
@@ -739,22 +825,30 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const MAX_WIDTH = 400;
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
+                        const scaleSize = Math.min(1, MAX_WIDTH / img.width);
+                        canvas.width = img.width * scaleSize;
                         canvas.height = img.height * scaleSize;
                         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                         master[field] = canvas.toDataURL('image/jpeg', 0.7);
                     };
+                    img.onerror = () => alert('Could not read that image. Please try a different file.');
                 };
+                reader.onerror = () => alert('Image upload failed. Please try again.');
                 reader.readAsDataURL(file);
             };
 
             const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
             const saveInvoice = async () => {
-                savedInvoices.value.push(JSON.parse(JSON.stringify(invoice)));
+                const snapshot = JSON.parse(JSON.stringify(invoice));
+                if (editingIndex.value !== null && savedInvoices.value[editingIndex.value]) {
+                    savedInvoices.value[editingIndex.value] = snapshot;
+                } else {
+                    savedInvoices.value.push(snapshot);
+                }
                 await saveToDB('invoices', savedInvoices.value);
-                alert('Invoice saved to history!');
+                alert(editingIndex.value !== null ? 'Invoice updated in history!' : 'Invoice saved to history!');
+                editingIndex.value = null;
                 Object.assign(invoice, {
                     number: getNewInvoiceNumber(), customerName: '', customerAddress: '', customerGstin: '', placeOfSupply: '',
                     items: [{ id: generateId(), description: '', hsn: '', qty: 1, unit: 'Nos', rate: 0, disc: 0, tax: 18, subItems: [] }]
@@ -763,12 +857,15 @@
 
             const loadInvoice = (idx) => {
                 Object.assign(invoice, normalizeInvoice(JSON.parse(JSON.stringify(savedInvoices.value[idx]))));
+                editingIndex.value = idx;
                 currentTab.value = 'create';
             };
 
             const deleteInvoice = async (idx) => { 
                 if(confirm('Delete this invoice?')) {
                     savedInvoices.value.splice(idx, 1);
+                    if (editingIndex.value === idx) editingIndex.value = null;
+                    else if (editingIndex.value !== null && editingIndex.value > idx) editingIndex.value -= 1;
                     await saveToDB('invoices', savedInvoices.value);
                 }
             };
@@ -792,10 +889,12 @@
             };
 
             // --- BACKUP & RESTORE ---
+            const BACKUP_VERSION = "8.0";
+
             const backupData = () => {
                 try {
                     const data = { 
-                        version: "8.0", 
+                        version: BACKUP_VERSION, 
                         master: JSON.parse(JSON.stringify(master)), 
                         savedInvoices: JSON.parse(JSON.stringify(savedInvoices.value)), 
                         exportDate: new Date().toISOString() 
@@ -817,6 +916,12 @@
                     try {
                         const data = JSON.parse(e.target.result);
                         if (!data.master || !data.savedInvoices) throw new Error("Invalid format");
+
+                        const backupMajor = String(data.version || '').split('.')[0];
+                        if (backupMajor !== BACKUP_VERSION.split('.')[0]) {
+                            const label = data.version ? `version ${data.version}` : 'an unknown version';
+                            if (!confirm(`This backup is from ${label}, but this app uses version ${BACKUP_VERSION}. Restoring it may produce unexpected results. Continue?`)) return;
+                        }
                         
                         Object.assign(master, data.master);
                         savedInvoices.value = data.savedInvoices.map(normalizeInvoice);
@@ -834,7 +939,8 @@
 
             return {
                 currentTab, master, invoice, savedInvoices,
-                getRowTotal, totalTaxable, totalDiscount, totalCGST, totalSGST, grandTotal, totalInWords,
+                getRowTotal, totalTaxable, totalDiscount, isInterState, totalCGST, totalSGST, totalIGST, grandTotal, totalInWords,
+                sanitizeNumber, customerGstinWarning, companyGstinWarning,
                 addItem, removeItem, addSubItem, removeSubItem, autoFillItem, 
                 addMasterItem, removeMasterItem, saveMasterSettings, handleImageUpload, formatDate,
                 saveInvoice, loadInvoice, deleteInvoice, calculateInvoiceTotal,
