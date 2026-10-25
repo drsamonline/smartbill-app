@@ -67,6 +67,16 @@
                     <p v-if="companyGstinWarning" class="text-xs text-amber-600 mt-1"><i class="fas fa-triangle-exclamation mr-1"></i>This does not look like a valid 15-character GSTIN.</p>
                 </div>
                 <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-1">Saved customers</label>
+                    <p class="text-xs text-gray-600 mb-2">Save a customer once and their GSTIN fills itself on every bill.</p>
+                    <div v-for="(c, i) in master.customers" :key="c.id" class="flex items-center gap-3 py-1 border-b border-gray-100">
+                        <span class="flex-1 text-sm"><b>{{ c.name }}</b>
+                            <span class="text-xs text-gray-500" v-if="c.gstin">{{ c.gstin }}</span></span>
+                        <button class="text-xs text-red-600" @click="removeCustomer(i)">remove</button>
+                    </div>
+                    <p v-if="!master.customers.length" class="text-xs text-gray-500">No saved customers yet - fill one in on a bill and press Save customer.</p>
+                </div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-semibold mb-1">Address</label>
                     <textarea v-model="master.address" rows="2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                 </div>
@@ -203,7 +213,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded border border-blue-100">
                 <div>
                     <label class="block text-sm font-semibold mb-1">Bill To (Name)</label>
+                    <select v-if="master.customers.length" @change="pickCustomer($event)"
+                            class="w-full border p-2 rounded mb-1 text-sm">
+                        <option value="">— pick a saved customer —</option>
+                        <option v-for="c in master.customers" :key="c.id" :value="c.id">{{ c.name }}<template v-if="c.gstin"> · {{ c.gstin }}</template></option>
+                    </select>
                     <input v-model="invoice.customerName" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                    <button type="button" class="text-xs text-blue-600 mt-1" @click="saveCustomer()">Save customer</button>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1">Customer GSTIN</label>
@@ -592,6 +608,9 @@
             const quotaAlertShown = ref(false); // Micro-optimization: prevent alert spam
             
             const defaultMaster = {
+                // A SAVED CUSTOMER, so the GSTIN is typed once. It was already on the bill
+                // (and validated); what was missing was not re-typing it on every invoice.
+                customers: [],
                 companyName: 'My Company Pvt Ltd',
                 gstin: '27AABCU9603R1ZX',
                 address: '123, Business Park, Mumbai, Maharashtra - 400001',
@@ -937,10 +956,36 @@
                 reader.readAsText(file);
             };
 
+            // Save the customer on the bill, so the next one is one click. Matching by name
+            // means a repeat customer is UPDATED, not duplicated.
+            const saveCustomer = () => {
+                const name = String(invoice.customerName || '').trim();
+                if (!name) { alert('Enter the customer name first.'); return; }
+                const rec = { id: '', name,
+                              gstin: String(invoice.customerGstin || '').trim().toUpperCase(),
+                              address: String(invoice.customerAddress || '').trim(),
+                              state: String(invoice.placeOfSupply || '').trim() };
+                const found = (master.customers || []).find(c => c.name.toLowerCase() === name.toLowerCase());
+                if (found) { Object.assign(found, rec, { id: found.id }); }
+                else { rec.id = generateId(); (master.customers = master.customers || []).push(rec); }
+                saveMasterSet();
+            };
+            const pickCustomer = (e) => {
+                const c = (master.customers || []).find(x => x.id === e.target.value);
+                e.target.value = '';
+                if (!c) return;
+                invoice.customerName = c.name;
+                invoice.customerGstin = c.gstin;
+                if (c.address) invoice.customerAddress = c.address;
+                if (c.state) invoice.placeOfSupply = c.state;
+            };
+            const removeCustomer = (i) => { master.customers.splice(i, 1); saveMasterSet(); };
+
             return {
                 currentTab, master, invoice, savedInvoices,
                 getRowTotal, totalTaxable, totalDiscount, isInterState, totalCGST, totalSGST, totalIGST, grandTotal, totalInWords,
                 sanitizeNumber, customerGstinWarning, companyGstinWarning,
+                saveCustomer, pickCustomer, removeCustomer,
                 addItem, removeItem, addSubItem, removeSubItem, autoFillItem, 
                 addMasterItem, removeMasterItem, saveMasterSettings, handleImageUpload, formatDate,
                 saveInvoice, loadInvoice, deleteInvoice, calculateInvoiceTotal,
