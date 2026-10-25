@@ -2,6 +2,12 @@
 
 # SmartBill India
 
+<!-- shot:start -->
+
+![Screenshot](docs/shot.png)
+
+<!-- shot:end -->
+
 **A fast, serverless, single-page billing and invoicing app for Indian businesses — GST-ready, offline-first, and private by design.**
 
 [![Stars](https://img.shields.io/github/stars/drsamonline/smartbill-app)](https://github.com/drsamonline/smartbill-app/stargazers)
