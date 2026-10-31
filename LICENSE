@@ -1,24 +1,28 @@
-SmartBill India Custom Dual License
-Copyright (c) 2026 Sohil Anwarbhai Momin
+Free for Personal and Single-Business Use
 
-This software is released under a Dual-License model. By using, copying, or modifying this software, you agree to the terms below.
+Copyright (c) 2026 Dr. Sohil Momin, Vadodara, Gujarat, India.
+All rights reserved except as expressly granted below.
 
-1. INDIVIDUAL AND NON-COMMERCIAL USE (FREE)
-Permission is hereby granted, free of charge, to any individual obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, and modify the Software strictly for personal, hobby, educational, or non-commercial purposes. 
+This licence governs the billing application in this repository (the "Work").
 
-2. COMMERCIAL AND BUSINESS USE (PAID)
-Any use of the Software by a business, corporation, LLC, partnership, or any other commercial entity for internal operations, revenue generation, or client billing requires a commercial license. 
+1. FREE TIER - PERSONAL AND SINGLE-BUSINESS USE
 
-To acquire a commercial license, you must contact the copyright holder to negotiate payment and terms. Using this software for commercial purposes without a paid license is strictly prohibited and constitutes copyright infringement.
+You may use the Work free of charge for personal use, and for the internal
+business use of one person or one business entity, including issuing invoices to
+that entity's own customers.
 
-3. REDISTRIBUTION
-You may share and redistribute the original or modified source code, provided that:
-a) You include this exact license file in all copies.
-b) You do not remove or alter the original copyright notice.
-c) You do not change the terms of this license (you cannot re-license this software under MIT, GPL, etc.).
+2. COMMERCIAL TIER - EVERYTHING ELSE
 
-4. JURISDICTION
-This License shall be governed by and construed in accordance with the laws of India. Any legal action or proceeding arising under this License shall be brought exclusively in the courts located in Vadodara, Gujarat.
+Any other use requires a paid licence: use by more than one entity, resale,
+white-labelling, embedding in a product you sell, or providing it as a service
+to third parties. Contact the author for terms.
 
-5. DISCLAIMER OF WARRANTY
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+3. WHAT YOU MAY NOT DO
+
+You may not remove the copyright notice, nor redistribute the Work as your own.
+
+4. NO WARRANTY
+
+The Work is provided "as is", without warranty of any kind. The author is not
+liable for any loss arising from its use, including any tax, GST or accounting
+consequence of using it.
