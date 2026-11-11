@@ -118,13 +118,15 @@ Contributions are welcome! Please fork the repository and submit pull requests.
 
 ## 🎧 Support
 
-For issues, commercial licensing, or inquiries, reach out via:
-
-- **Email:** sohilmomin2000@gmail.com
-- **Creator Profile:** [about.me/drsohil](https://about.me/drsohil)
-- **GitHub Issues:** [github.com/DrSamOnline/SmartBill-India/issues](https://github.com/DrSamOnline)
-
----
+| | |
+|---|---|
+| UPI (India) | `drsohilboi@ybl` — payee Dr Sohil Momin, open amount, or scan [the QR](docs/assets/upi-qr.svg) |
+| GitHub Sponsors | [github.com/sponsors/drsamonline](https://github.com/sponsors/drsamonline) |
+| Ko-fi | [ko-fi.com/matneo](https://ko-fi.com/matneo) |
+| PayPal | [paypal.me/drsohilmomin](https://paypal.me/drsohilmomin?locale.x=en_GB&country.x=IN) |
+| My books | [Amazon author store](https://www.amazon.com/stores/author/B08ZT331LY/allbooks?ccs_id=aed72b9f-71d9-41dc-adee-e9368a317acc) |
+| More apps | [drsamonline.github.io](https://drsamonline.github.io/) |
+| Email | [sohilmomin2000@gmail.com](mailto:sohilmomin2000@gmail.com) |
 
 ## ⚖️ License
 
